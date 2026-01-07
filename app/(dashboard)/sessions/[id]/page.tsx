@@ -259,6 +259,14 @@ export default function SessionDetailPage() {
     }
   }
 
+  const getDownloadUrl = (url: string) => {
+    // Add fl_attachment to Cloudinary URLs to force download
+    if (url.includes('cloudinary.com')) {
+      return url.replace('/upload/', '/upload/fl_attachment/')
+    }
+    return url
+  }
+
   const getFileIcon = (url: string) => {
     const lower = url.toLowerCase()
     if (lower.includes('youtube') || lower.includes('youtu.be') || lower.match(/\.(mp4|webm|mov)$/)) {
@@ -419,10 +427,9 @@ export default function SessionDetailPage() {
                           </a>
                           <div className="flex items-center gap-1">
                             <a
-                              href={material.url}
+                              href={getDownloadUrl(material.url)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              download
                             >
                               <Button
                                 variant="ghost"
