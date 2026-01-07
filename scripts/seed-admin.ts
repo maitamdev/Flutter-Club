@@ -21,7 +21,7 @@ const firebaseConfig = {
 // ============ CẤU HÌNH ADMIN ============
 const ADMIN_EMAIL = 'admin@ftclub.com'
 const ADMIN_PASSWORD = 'Admin@123456'
-const ADMIN_NAME = 'Admin FT-Club'
+const ADMIN_NAME = 'Admin WebOOM'
 const ADMIN_STUDENT_ID = 'ADMIN001'
 // ========================================
 

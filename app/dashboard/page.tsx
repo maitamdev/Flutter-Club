@@ -10,6 +10,10 @@ import {
   TrendingUp,
   Bell,
   ArrowRight,
+  Sparkles,
+  Zap,
+  Target,
+  Award,
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -30,6 +34,11 @@ export default function DashboardPage() {
     upcomingSessions: 0,
     pendingAssignments: 0,
   })
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,14 +88,16 @@ export default function DashboardPage() {
       title: 'Buổi học sắp tới',
       value: stats.upcomingSessions,
       icon: Calendar,
-      color: 'from-blue-500 to-blue-600',
+      gradient: 'from-violet-500 to-purple-600',
+      bgGradient: 'from-violet-500/10 to-purple-500/10',
       href: '/sessions',
     },
     {
       title: 'Bài tập đang mở',
       value: stats.pendingAssignments,
       icon: FileText,
-      color: 'from-green-500 to-green-600',
+      gradient: 'from-emerald-500 to-teal-600',
+      bgGradient: 'from-emerald-500/10 to-teal-500/10',
       href: '/assignments',
     },
     ...(isAdmin
@@ -95,41 +106,93 @@ export default function DashboardPage() {
             title: 'Thành viên',
             value: stats.totalMembers,
             icon: Users,
-            color: 'from-purple-500 to-purple-600',
+            gradient: 'from-blue-500 to-cyan-600',
+            bgGradient: 'from-blue-500/10 to-cyan-500/10',
             href: '/members',
           },
         ]
       : []),
   ]
 
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return 'Chào buổi sáng'
+    if (hour < 18) return 'Chào buổi chiều'
+    return 'Chào buổi tối'
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       {/* Welcome Section */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold">
-          Xin chào, {user?.name?.split(' ').pop()} 👋
-        </h1>
-        <p className="text-muted-foreground">
-          Chào mừng bạn đến với FT-Club Hub. Đây là tổng quan hoạt động của bạn.
-        </p>
+      <div className={`relative overflow-hidden rounded-2xl p-6 lg:p-8 text-white transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700" />
+        
+        {/* Animated background shapes */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl" />
+        </div>
+        
+        {/* Pattern overlay */}
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }} />
+        
+        <div className="relative">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-sm mb-4">
+                <Sparkles className="h-4 w-4 text-yellow-300" />
+                <span className="text-blue-100">{getGreeting()}</span>
+              </div>
+              <h1 className="text-3xl lg:text-4xl font-bold mb-3">
+                Xin chào, {user?.name?.split(' ').pop()}! 👋
+              </h1>
+              <p className="text-blue-100 text-base lg:text-lg max-w-xl leading-relaxed">
+                Chào mừng bạn đến với WebOOM DHV TEC. Hãy cùng khám phá và học hỏi những điều mới mẻ!
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/sessions">
+                <Button className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm rounded-xl h-11 px-5">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Xem lịch học
+                </Button>
+              </Link>
+              {isTrainer && (
+                <Link href="/sessions/new">
+                  <Button className="bg-white text-blue-600 hover:bg-blue-50 border-0 rounded-xl h-11 px-5 font-semibold">
+                    <Zap className="mr-2 h-4 w-4" />
+                    Tạo buổi học
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {statCards.map((stat) => (
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {statCards.map((stat, index) => (
           <Link key={stat.title} href={stat.href}>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer overflow-hidden">
+            <Card className={`group hover-card cursor-pointer overflow-hidden border-0 shadow-lg transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: `${(index + 1) * 100}ms` }}>
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
+                <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-50`} />
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">{stat.title}</p>
-                    <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                    <p className="text-sm text-muted-foreground font-medium">{stat.title}</p>
+                    <p className="text-4xl font-bold mt-2 gradient-text">{stat.value}</p>
                   </div>
-                  <div
-                    className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}
-                  >
-                    <stat.icon className="h-6 w-6 text-white" />
+                  <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <stat.icon className="h-7 w-7 text-white" />
                   </div>
+                </div>
+                <div className="relative mt-4 flex items-center text-sm text-muted-foreground">
+                  <ArrowRight className="h-4 w-4 mr-1 group-hover:translate-x-1 transition-transform" />
+                  Xem chi tiết
                 </div>
               </CardContent>
             </Card>
@@ -140,62 +203,71 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Attendance Chart - Only for Admin/Trainer */}
+          {/* Attendance Chart */}
           {isTrainer && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Thống kê điểm danh
-                </CardTitle>
-                <CardDescription>
-                  Tỷ lệ điểm danh 7 buổi học gần nhất
-                </CardDescription>
+            <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '400ms' }}>
+              <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                    <TrendingUp className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Thống kê điểm danh</CardTitle>
+                    <CardDescription>Tỷ lệ điểm danh 7 buổi học gần nhất</CardDescription>
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <AttendanceChart />
               </CardContent>
             </Card>
           )}
 
           {/* Upcoming Sessions */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Buổi học sắp tới</CardTitle>
-                <CardDescription>Lịch học trong thời gian tới</CardDescription>
+          <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '500ms' }}>
+            <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Buổi học sắp tới</CardTitle>
+                    <CardDescription>Lịch học trong thời gian tới</CardDescription>
+                  </div>
+                </div>
+                <Link href="/sessions">
+                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                    Xem tất cả
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <Link href="/sessions">
-                <Button variant="ghost" size="sm">
-                  Xem tất cả
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               {sessions.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  Chưa có buổi học nào được lên lịch
-                </p>
+                <div className="text-center py-12">
+                  <div className="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <p className="text-muted-foreground">Chưa có buổi học nào được lên lịch</p>
+                </div>
               ) : (
-                <div className="space-y-4">
-                  {sessions.map((session) => (
-                    <Link
-                      key={session.id}
-                      href={`/sessions/${session.id}`}
-                      className="block"
-                    >
-                      <div className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-                        <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold">
-                          {new Date(session.startsAt).getDate()}
+                <div className="space-y-3">
+                  {sessions.map((session, index) => (
+                    <Link key={session.id} href={`/sessions/${session.id}`} className="block">
+                      <div className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-cyan-50/50 dark:hover:from-blue-900/10 dark:hover:to-cyan-900/10 transition-all duration-200">
+                        <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                          <span className="text-lg font-bold leading-none">{new Date(session.startsAt).getDate()}</span>
+                          <span className="text-[10px] uppercase opacity-80">Th{new Date(session.startsAt).getMonth() + 1}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{session.title}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-semibold truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{session.title}</p>
+                          <p className="text-sm text-muted-foreground mt-0.5">
                             {formatDateTime(new Date(session.startsAt))}
                           </p>
                         </div>
-                        <Badge variant="secondary">
+                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-0">
                           {getRelativeTime(new Date(session.startsAt))}
                         </Badge>
                       </div>
@@ -207,55 +279,62 @@ export default function DashboardPage() {
           </Card>
 
           {/* Assignments */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Bài tập</CardTitle>
-                <CardDescription>Các bài tập cần hoàn thành</CardDescription>
+          <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '600ms' }}>
+            <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
+                    <FileText className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Bài tập</CardTitle>
+                    <CardDescription>Các bài tập cần hoàn thành</CardDescription>
+                  </div>
+                </div>
+                <Link href="/assignments">
+                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                    Xem tất cả
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <Link href="/assignments">
-                <Button variant="ghost" size="sm">
-                  Xem tất cả
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               {assignments.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  Chưa có bài tập nào
-                </p>
+                <div className="text-center py-12">
+                  <div className="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+                    <FileText className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <p className="text-muted-foreground">Chưa có bài tập nào</p>
+                </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {assignments.map((assignment) => {
                     const overdue = isOverdue(new Date(assignment.dueAt))
                     return (
-                      <Link
-                        key={assignment.id}
-                        href={`/assignments/${assignment.id}`}
-                        className="block"
-                      >
-                        <div className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-                          <div
-                            className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                              overdue
-                                ? 'bg-red-100 text-red-600 dark:bg-red-900/30'
-                                : 'bg-green-100 text-green-600 dark:bg-green-900/30'
-                            }`}
-                          >
+                      <Link key={assignment.id} href={`/assignments/${assignment.id}`} className="block">
+                        <div className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-emerald-200 dark:hover:border-emerald-800 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-900/10 dark:hover:to-teal-900/10 transition-all duration-200">
+                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform ${
+                            overdue
+                              ? 'bg-gradient-to-br from-red-500 to-pink-500'
+                              : 'bg-gradient-to-br from-emerald-500 to-teal-500'
+                          }`}>
                             {overdue ? (
-                              <Clock className="h-5 w-5" />
+                              <Clock className="h-5 w-5 text-white" />
                             ) : (
-                              <FileText className="h-5 w-5" />
+                              <FileText className="h-5 w-5 text-white" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{assignment.title}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="font-semibold truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{assignment.title}</p>
+                            <p className="text-sm text-muted-foreground mt-0.5">
                               Deadline: {formatDateTime(new Date(assignment.dueAt))}
                             </p>
                           </div>
-                          <Badge variant={overdue ? 'destructive' : 'secondary'}>
+                          <Badge className={overdue 
+                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0' 
+                            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0'
+                          }>
                             {overdue ? 'Quá hạn' : getRelativeTime(new Date(assignment.dueAt))}
                           </Badge>
                         </div>
@@ -268,32 +347,37 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Sidebar - Announcements */}
+        {/* Sidebar */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Thông báo mới
-              </CardTitle>
+          {/* Announcements */}
+          <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '700ms' }}>
+            <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg">
+                  <Bell className="h-5 w-5 text-white" />
+                </div>
+                <CardTitle>Thông báo mới</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               {announcements.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">
-                  Chưa có thông báo nào
-                </p>
+                <div className="text-center py-8">
+                  <Bell className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Chưa có thông báo nào</p>
+                </div>
               ) : (
                 <div className="space-y-4">
-                  {announcements.map((announcement) => (
+                  {announcements.map((announcement, index) => (
                     <div
                       key={announcement.id}
-                      className="border-l-2 border-blue-500 pl-4 py-2"
+                      className="relative pl-4 py-2 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:rounded-full before:bg-gradient-to-b before:from-pink-500 before:to-rose-500"
                     >
                       <p className="font-medium text-sm">{announcement.title}</p>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {announcement.content}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
                         {getRelativeTime(new Date(announcement.createdAt))}
                       </p>
                     </div>
@@ -301,35 +385,54 @@ export default function DashboardPage() {
                 </div>
               )}
               <Link href="/announcements" className="block mt-4">
-                <Button variant="outline" className="w-full" size="sm">
+                <Button variant="outline" className="w-full rounded-xl" size="sm">
                   Xem tất cả thông báo
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          {/* Quick Actions for Trainer/Admin */}
+          {/* Quick Actions */}
           {isTrainer && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Thao tác nhanh</CardTitle>
+            <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '800ms' }}>
+              <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                    <Zap className="h-5 w-5 text-white" />
+                  </div>
+                  <CardTitle>Thao tác nhanh</CardTitle>
+                </div>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="p-4 space-y-2">
                 <Link href="/sessions/new" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Calendar className="mr-2 h-4 w-4" />
+                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 dark:hover:bg-violet-900/20 dark:hover:border-violet-800 dark:hover:text-violet-400 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center mr-3">
+                      <Calendar className="h-4 w-4 text-white" />
+                    </div>
                     Tạo buổi học mới
                   </Button>
                 </Link>
                 <Link href="/assignments/new" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    <FileText className="mr-2 h-4 w-4" />
+                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 dark:hover:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:text-emerald-400 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mr-3">
+                      <FileText className="h-4 w-4 text-white" />
+                    </div>
                     Tạo bài tập mới
                   </Button>
                 </Link>
+                <Link href="/quizzes/new" className="block">
+                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 dark:hover:bg-orange-900/20 dark:hover:border-orange-800 dark:hover:text-orange-400 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center mr-3">
+                      <Target className="h-4 w-4 text-white" />
+                    </div>
+                    Tạo quiz mới
+                  </Button>
+                </Link>
                 <Link href="/announcements" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Bell className="mr-2 h-4 w-4" />
+                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-pink-50 hover:border-pink-200 hover:text-pink-700 dark:hover:bg-pink-900/20 dark:hover:border-pink-800 dark:hover:text-pink-400 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mr-3">
+                      <Bell className="h-4 w-4 text-white" />
+                    </div>
                     Đăng thông báo
                   </Button>
                 </Link>

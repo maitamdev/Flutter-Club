@@ -11,6 +11,8 @@ export interface User {
   role: UserRole
   status: UserStatus
   photoURL?: string
+  phone?: string
+  address?: string
   createdAt: Date
 }
 

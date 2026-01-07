@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Bell, Plus, Trash2, Loader2 } from 'lucide-react'
+import { Bell, Plus, Trash2, Loader2, Megaphone, Clock, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -37,6 +37,11 @@ export default function AnnouncementsPage() {
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const {
     register,
@@ -100,36 +105,49 @@ export default function AnnouncementsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <div>
-          <h1 className="text-2xl font-bold">Thông báo</h1>
-          <p className="text-muted-foreground">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
+              <Bell className="h-5 w-5 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold">Thông báo</h1>
+          </div>
+          <p className="text-muted-foreground ml-12">
             Các thông báo từ CLB
           </p>
         </div>
         {isTrainer && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+              <Button className="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 shadow-lg shadow-pink-500/25 rounded-xl h-11">
                 <Plus className="mr-2 h-4 w-4" />
                 Đăng thông báo
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle>Đăng thông báo mới</DialogTitle>
-                <DialogDescription>
-                  Thông báo sẽ được hiển thị cho tất cả thành viên
-                </DialogDescription>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                    <Megaphone className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <DialogTitle>Đăng thông báo mới</DialogTitle>
+                    <DialogDescription>
+                      Thông báo sẽ được hiển thị cho tất cả thành viên
+                    </DialogDescription>
+                  </div>
+                </div>
               </DialogHeader>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Tiêu đề</Label>
                   <Input
                     id="title"
                     placeholder="Tiêu đề thông báo"
+                    className="h-11 rounded-xl"
                     {...register('title')}
                   />
                   {errors.title && (
@@ -144,6 +162,7 @@ export default function AnnouncementsPage() {
                     id="content"
                     placeholder="Nội dung thông báo..."
                     rows={5}
+                    className="rounded-xl resize-none"
                     {...register('content')}
                   />
                   {errors.content && (
@@ -152,19 +171,27 @@ export default function AnnouncementsPage() {
                     </p>
                   )}
                 </div>
-                <DialogFooter>
+                <DialogFooter className="gap-2 sm:gap-0">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setDialogOpen(false)}
+                    className="rounded-xl"
                   >
                     Hủy
                   </Button>
-                  <Button type="submit" disabled={creating}>
+                  <Button 
+                    type="submit" 
+                    disabled={creating}
+                    className="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 rounded-xl"
+                  >
                     {creating ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      'Đăng thông báo'
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Đăng thông báo
+                      </>
                     )}
                   </Button>
                 </DialogFooter>
@@ -178,11 +205,11 @@ export default function AnnouncementsPage() {
       {loading ? (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="animate-pulse border-0 shadow-lg">
               <CardContent className="p-6">
-                <div className="h-6 bg-muted rounded w-1/3 mb-4" />
-                <div className="h-4 bg-muted rounded w-full mb-2" />
-                <div className="h-4 bg-muted rounded w-2/3" />
+                <div className="h-6 bg-muted rounded-lg w-1/3 mb-4" />
+                <div className="h-4 bg-muted rounded-lg w-full mb-2" />
+                <div className="h-4 bg-muted rounded-lg w-2/3" />
               </CardContent>
             </Card>
           ))}
@@ -194,7 +221,7 @@ export default function AnnouncementsPage() {
           description="Các thông báo từ CLB sẽ được hiển thị ở đây"
           action={
             isTrainer ? (
-              <Button onClick={() => setDialogOpen(true)}>
+              <Button onClick={() => setDialogOpen(true)} className="rounded-xl">
                 <Plus className="mr-2 h-4 w-4" />
                 Đăng thông báo đầu tiên
               </Button>
@@ -203,29 +230,42 @@ export default function AnnouncementsPage() {
         />
       ) : (
         <div className="space-y-4">
-          {announcements.map((announcement) => (
-            <Card key={announcement.id} className="overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
-              <CardHeader className="flex flex-row items-start justify-between">
-                <div>
-                  <CardTitle className="text-lg">{announcement.title}</CardTitle>
-                  <CardDescription>
-                    {formatDateTime(new Date(announcement.createdAt))} •{' '}
-                    {getRelativeTime(new Date(announcement.createdAt))}
-                  </CardDescription>
+          {announcements.map((announcement, index) => (
+            <Card 
+              key={announcement.id} 
+              className={`group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              style={{ transitionDelay: `${(index + 1) * 50}ms` }}
+            >
+              <div className="h-1.5 bg-gradient-to-r from-pink-500 to-rose-600" />
+              <CardHeader className="flex flex-row items-start justify-between pb-2">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg shrink-0">
+                    <Megaphone className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                      {announcement.title}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-2 mt-1">
+                      <Clock className="h-3.5 w-3.5" />
+                      {formatDateTime(new Date(announcement.createdAt))} •{' '}
+                      {getRelativeTime(new Date(announcement.createdAt))}
+                    </CardDescription>
+                  </div>
                 </div>
                 {isTrainer && (
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(announcement.id)}
+                    className="h-9 w-9 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
               </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap text-muted-foreground">
+              <CardContent className="pt-0 pl-20">
+                <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed">
                   {announcement.content}
                 </p>
               </CardContent>
