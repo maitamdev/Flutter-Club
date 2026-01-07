@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Bell, Plus, Trash2, Loader2, Megaphone, Clock, Sparkles } from 'lucide-react'
+import { Bell, Plus, Trash2, Loader2, Megaphone, Clock, Sparkles, CheckCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,10 +30,30 @@ import { formatDateTime, getRelativeTime } from '@/lib/utils'
 import { EmptyState } from '@/components/layout/empty-state'
 import { announcementSchema, AnnouncementFormData } from '@/lib/validations'
 
+// Helper functions for read announcements
+const getReadAnnouncementIds = (userId: string): string[] => {
+  if (typeof window === 'undefined') return []
+  const stored = localStorage.getItem(`readAnnouncements_${userId}`)
+  return stored ? JSON.parse(stored) : []
+}
+
+const markAnnouncementAsRead = (userId: string, announcementId: string) => {
+  const readIds = getReadAnnouncementIds(userId)
+  if (!readIds.includes(announcementId)) {
+    readIds.push(announcementId)
+    localStorage.setItem(`readAnnouncements_${userId}`, JSON.stringify(readIds))
+  }
+}
+
+const markAllAnnouncementsAsRead = (userId: string, announcementIds: string[]) => {
+  localStorage.setItem(`readAnnouncements_${userId}`, JSON.stringify(announcementIds))
+}
+
 export default function AnnouncementsPage() {
   const { user, isTrainer } = useAuth()
   const { toast } = useToast()
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [readIds, setReadIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -42,6 +62,13 @@ export default function AnnouncementsPage() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Load read announcements from localStorage
+  useEffect(() => {
+    if (user) {
+      setReadIds(getReadAnnouncementIds(user.uid))
+    }
+  }, [user])
 
   const {
     register,
@@ -104,6 +131,28 @@ export default function AnnouncementsPage() {
     }
   }
 
+  const handleMarkAsRead = (announcementId: string) => {
+    if (!user) return
+    markAnnouncementAsRead(user.uid, announcementId)
+    setReadIds(getReadAnnouncementIds(user.uid))
+    // Dispatch event to update sidebar
+    window.dispatchEvent(new CustomEvent('announcementRead'))
+  }
+
+  const handleMarkAllAsRead = () => {
+    if (!user) return
+    const allIds = announcements.map(a => a.id)
+    markAllAnnouncementsAsRead(user.uid, allIds)
+    setReadIds(allIds)
+    // Dispatch event to update sidebar
+    window.dispatchEvent(new CustomEvent('announcementRead'))
+    toast({
+      title: 'Đã đánh dấu tất cả là đã đọc',
+    })
+  }
+
+  const unreadCount = announcements.filter(a => !readIds.includes(a.id)).length
+
   return (
     <div className="space-y-6 pb-8">
       {/* Header */}
@@ -114,19 +163,35 @@ export default function AnnouncementsPage() {
               <Bell className="h-5 w-5 text-white" />
             </div>
             <h1 className="text-2xl font-bold">Thông báo</h1>
+            {unreadCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-pink-500 text-white text-xs font-bold">
+                {unreadCount} mới
+              </span>
+            )}
           </div>
           <p className="text-muted-foreground ml-12">
             Các thông báo từ CLB
           </p>
         </div>
-        {isTrainer && (
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 shadow-lg shadow-pink-500/25 rounded-xl h-11">
-                <Plus className="mr-2 h-4 w-4" />
-                Đăng thông báo
-              </Button>
-            </DialogTrigger>
+        <div className="flex gap-2">
+          {unreadCount > 0 && (
+            <Button 
+              variant="outline" 
+              onClick={handleMarkAllAsRead}
+              className="rounded-xl h-11"
+            >
+              <CheckCheck className="mr-2 h-4 w-4" />
+              Đánh dấu tất cả đã đọc
+            </Button>
+          )}
+          {isTrainer && (
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 shadow-lg shadow-pink-500/25 rounded-xl h-11">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Đăng thông báo
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader>
                 <div className="flex items-center gap-3">
@@ -198,7 +263,8 @@ export default function AnnouncementsPage() {
               </form>
             </DialogContent>
           </Dialog>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Announcements List */}
@@ -230,22 +296,31 @@ export default function AnnouncementsPage() {
         />
       ) : (
         <div className="space-y-4">
-          {announcements.map((announcement, index) => (
+          {announcements.map((announcement, index) => {
+            const isUnread = !readIds.includes(announcement.id)
+            return (
             <Card 
               key={announcement.id} 
-              className={`group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              className={`group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} ${isUnread ? 'ring-2 ring-pink-500/50' : ''}`}
               style={{ transitionDelay: `${(index + 1) * 50}ms` }}
             >
-              <div className="h-1.5 bg-gradient-to-r from-pink-500 to-rose-600" />
+              <div className={`h-1.5 bg-gradient-to-r ${isUnread ? 'from-pink-500 to-rose-600' : 'from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700'}`} />
               <CardHeader className="flex flex-row items-start justify-between pb-2">
                 <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg shrink-0">
+                  <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-lg shrink-0 ${isUnread ? 'bg-gradient-to-br from-pink-500 to-rose-600' : 'bg-gradient-to-br from-gray-400 to-gray-500'}`}>
                     <Megaphone className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                      {announcement.title}
-                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-lg group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                        {announcement.title}
+                      </CardTitle>
+                      {isUnread && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-pink-500 text-white text-[10px] font-bold">
+                          MỚI
+                        </span>
+                      )}
+                    </div>
                     <CardDescription className="flex items-center gap-2 mt-1">
                       <Clock className="h-3.5 w-3.5" />
                       {formatDateTime(new Date(announcement.createdAt))} •{' '}
@@ -253,16 +328,29 @@ export default function AnnouncementsPage() {
                     </CardDescription>
                   </div>
                 </div>
-                {isTrainer && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(announcement.id)}
-                    className="h-9 w-9 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
+                <div className="flex items-center gap-1">
+                  {isUnread && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleMarkAsRead(announcement.id)}
+                      className="h-9 rounded-lg text-pink-500 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-900/20"
+                    >
+                      <CheckCheck className="h-4 w-4 mr-1" />
+                      Đã đọc
+                    </Button>
+                  )}
+                  {isTrainer && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(announcement.id)}
+                      className="h-9 w-9 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="pt-0 pl-20">
                 <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed">
@@ -270,7 +358,7 @@ export default function AnnouncementsPage() {
                 </p>
               </CardContent>
             </Card>
-          ))}
+          )})}
         </div>
       )}
     </div>

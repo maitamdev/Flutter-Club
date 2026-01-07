@@ -107,6 +107,17 @@ interface Counts {
   requests: number
 }
 
+// Helper to get read announcement IDs from localStorage
+const getReadAnnouncementIds = (userId: string): string[] => {
+  if (typeof window === 'undefined') return []
+  try {
+    const stored = localStorage.getItem(`readAnnouncements_${userId}`)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -183,19 +194,41 @@ export function Sidebar() {
 
   // Subscribe to realtime updates
   useEffect(() => {
-    // Announcements - realtime
+    if (!user) return
+
+    // Announcements - realtime, count unread only
     const unsubAnnouncements = subscribeToAnnouncements((announcements) => {
-      // Count announcements from last 7 days
+      // Count announcements from last 7 days that are unread
       const weekAgo = new Date()
       weekAgo.setDate(weekAgo.getDate() - 7)
-      const recentCount = announcements.filter(a => new Date(a.createdAt) > weekAgo).length
-      setCounts(prev => ({ ...prev, announcements: recentCount }))
+      const readIds = getReadAnnouncementIds(user.uid)
+      const unreadCount = announcements.filter(a => 
+        new Date(a.createdAt) > weekAgo && !readIds.includes(a.id)
+      ).length
+      setCounts(prev => ({ ...prev, announcements: unreadCount }))
     }, 50)
+
+    // Listen for announcement read events
+    const handleAnnouncementRead = () => {
+      // Re-fetch to update count
+      subscribeToAnnouncements((announcements) => {
+        const weekAgo = new Date()
+        weekAgo.setDate(weekAgo.getDate() - 7)
+        const readIds = getReadAnnouncementIds(user.uid)
+        const unreadCount = announcements.filter(a => 
+          new Date(a.createdAt) > weekAgo && !readIds.includes(a.id)
+        ).length
+        setCounts(prev => ({ ...prev, announcements: unreadCount }))
+      }, 50)()
+    }
+    
+    window.addEventListener('announcementRead', handleAnnouncementRead)
 
     return () => {
       unsubAnnouncements()
+      window.removeEventListener('announcementRead', handleAnnouncementRead)
     }
-  }, [])
+  }, [user])
 
   // Subscribe to access requests (admin only)
   useEffect(() => {
