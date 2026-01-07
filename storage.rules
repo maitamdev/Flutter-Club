@@ -15,6 +15,15 @@ service firebase.storage {
                    && request.resource.size < 10 * 1024 * 1024; // Max 10MB
     }
     
+    // Materials folder - trainers/admins can upload session materials
+    match /materials/{sessionId}/{fileName} {
+      // Everyone can read materials
+      allow read: if isAuthenticated();
+      // Only authenticated users can upload (role check done in app)
+      allow write: if isAuthenticated()
+                   && request.resource.size < 50 * 1024 * 1024; // Max 50MB
+    }
+    
     // Default deny all other paths
     match /{allPaths=**} {
       allow read, write: if false;
