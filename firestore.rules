@@ -34,6 +34,18 @@ service cloud.firestore {
       allow create: if isAdmin();
       allow update: if isAdmin() || isOwner(userId);
       allow delete: if isAdmin();
+
+      // Notifications subcollection
+      match /notifications/{notificationId} {
+        // Users can only read their own notifications
+        allow read: if isOwner(userId);
+        // System (trainers/admin) can create notifications for any user
+        allow create: if isTrainer();
+        // Users can update their own (mark as read)
+        allow update: if isOwner(userId);
+        // Users can delete their own
+        allow delete: if isOwner(userId);
+      }
     }
 
     // Access Requests collection

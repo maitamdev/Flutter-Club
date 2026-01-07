@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { createSession } from '@/lib/firebase/firestore'
+import { notifyNewSession } from '@/lib/utils/notifications'
 import { sessionSchema, SessionFormData } from '@/lib/validations'
 
 export default function NewSessionPage() {
@@ -44,7 +45,7 @@ export default function NewSessionPage() {
 
     setLoading(true)
     try {
-      await createSession({
+      const docRef = await createSession({
         title: data.title,
         description: data.description,
         startsAt: data.startsAt,
@@ -53,6 +54,9 @@ export default function NewSessionPage() {
         trainerName: user.name,
         materials: data.materials || [],
       })
+
+      // Gửi thông báo cho tất cả members
+      await notifyNewSession(data.title, docRef.id, user.uid)
 
       toast({
         title: 'Tạo buổi học thành công',

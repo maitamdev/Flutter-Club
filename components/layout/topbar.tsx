@@ -2,19 +2,19 @@
 
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/navigation'
-import { Moon, Sun, LogOut, User, Bell, Settings, Sparkles } from 'lucide-react'
+import { Moon, Sun, LogOut, User, Settings, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { cn } from '@/lib/utils'
+import { NotificationDropdown } from './notification-dropdown'
 
 export function Topbar() {
   const { theme, setTheme } = useTheme()
@@ -54,19 +54,7 @@ export function Topbar() {
       {/* Actions */}
       <div className="flex items-center gap-2">
         {/* Notifications */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-            <span className="relative flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-[10px] font-bold text-white">
-              3
-            </span>
-          </span>
-        </Button>
+        <NotificationDropdown />
 
         {/* Theme Toggle */}
         <Button

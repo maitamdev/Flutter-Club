@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { createAssignment } from '@/lib/firebase/firestore'
+import { notifyNewAssignment } from '@/lib/utils/notifications'
 import { assignmentSchema, AssignmentFormData } from '@/lib/validations'
 
 export default function NewAssignmentPage() {
@@ -44,13 +45,16 @@ export default function NewAssignmentPage() {
 
     setLoading(true)
     try {
-      await createAssignment({
+      const docRef = await createAssignment({
         title: data.title,
         description: data.description,
         dueAt: data.dueAt,
         rubric: data.rubric,
         createdBy: user.uid,
       })
+
+      // Gửi thông báo cho tất cả members
+      await notifyNewAssignment(data.title, docRef.id, user.uid)
 
       toast({
         title: 'Tạo bài tập thành công',

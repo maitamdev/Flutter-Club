@@ -25,6 +25,7 @@ import {
   createAnnouncement,
   deleteAnnouncement,
 } from '@/lib/firebase/firestore'
+import { notifyNewAnnouncement } from '@/lib/utils/notifications'
 import { Announcement } from '@/types'
 import { formatDateTime, getRelativeTime } from '@/lib/utils'
 import { EmptyState } from '@/components/layout/empty-state'
@@ -98,6 +99,9 @@ export default function AnnouncementsPage() {
         content: data.content,
         createdBy: user.uid,
       })
+
+      // Gửi thông báo cho tất cả members
+      await notifyNewAnnouncement(data.title, user.uid)
 
       toast({
         title: 'Đăng thông báo thành công',

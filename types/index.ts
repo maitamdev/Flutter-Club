@@ -146,6 +146,29 @@ export interface Comment {
   createdAt: Date
 }
 
+// Notification Types
+export type NotificationType = 
+  | 'session_created'
+  | 'session_reminder'
+  | 'assignment_created'
+  | 'assignment_due'
+  | 'submission_graded'
+  | 'quiz_available'
+  | 'announcement'
+  | 'access_approved'
+  | 'access_rejected'
+
+export interface Notification {
+  id: string
+  userId: string
+  type: NotificationType
+  title: string
+  message: string
+  link?: string
+  isRead: boolean
+  createdAt: Date
+}
+
 // Dashboard Stats
 export interface DashboardStats {
   totalMembers: number

@@ -21,6 +21,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { createQuiz, getSessions } from '@/lib/firebase/firestore'
+import { notifyNewQuiz } from '@/lib/utils/notifications'
 import { Session } from '@/types'
 import { quizSchema, QuizFormData } from '@/lib/validations'
 
@@ -73,7 +74,7 @@ export default function NewQuizPage() {
       const now = new Date()
       const endsAt = new Date(now.getTime() + data.duration * 60 * 1000)
 
-      await createQuiz({
+      const docRef = await createQuiz({
         title: data.title,
         sessionId: data.sessionId,
         duration: data.duration,
@@ -88,6 +89,9 @@ export default function NewQuizPage() {
         endsAt,
         createdBy: user.uid,
       })
+
+      // Gửi thông báo cho tất cả members
+      await notifyNewQuiz(data.title, docRef.id, user.uid)
 
       toast({
         title: 'Tạo quiz thành công',

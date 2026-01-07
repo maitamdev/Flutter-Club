@@ -20,6 +20,7 @@ import {
   subscribeToAccessRequests,
   updateAccessRequest,
 } from '@/lib/firebase/firestore'
+import { notifyAccessRequestResult } from '@/lib/utils/notifications'
 import { createUserDocument } from '@/lib/firebase/auth'
 import { AccessRequest, AccessRequestStatus } from '@/types'
 import { formatDateTime } from '@/lib/utils'
@@ -65,6 +66,9 @@ export default function AccessRequestsPage() {
         reviewedBy: user.uid,
       })
 
+      // Gửi thông báo cho user
+      await notifyAccessRequestResult(request.uid, true)
+
       toast({
         title: 'Đã duyệt yêu cầu',
         description: `${request.name} đã được thêm vào CLB`,
@@ -89,6 +93,9 @@ export default function AccessRequestsPage() {
         status: 'rejected',
         reviewedBy: user.uid,
       })
+
+      // Gửi thông báo cho user
+      await notifyAccessRequestResult(request.uid, false)
 
       toast({
         title: 'Đã từ chối yêu cầu',

@@ -56,6 +56,7 @@ import {
   subscribeToComments,
   deleteComment,
 } from '@/lib/firebase/firestore'
+import { notifySubmissionGraded } from '@/lib/utils/notifications'
 import { uploadToCloudinary, CLOUDINARY_CLOUD_NAME } from '@/lib/cloudinary/config'
 import { Assignment, Submission, Comment } from '@/types'
 import { formatDateTime, isOverdue, formatTime } from '@/lib/utils'
@@ -190,7 +191,7 @@ export default function AssignmentDetailPage() {
   }
 
   const handleGrade = async (data: GradeFormData) => {
-    if (!selectedSubmission || !user) return
+    if (!selectedSubmission || !user || !assignment) return
 
     setGrading(true)
     try {
@@ -200,6 +201,14 @@ export default function AssignmentDetailPage() {
         data.score,
         data.feedback || '',
         user.uid
+      )
+
+      // Gửi thông báo cho student
+      await notifySubmissionGraded(
+        selectedSubmission.uid,
+        assignment.title,
+        assignmentId,
+        data.score
       )
 
       toast({

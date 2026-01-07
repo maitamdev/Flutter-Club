@@ -29,6 +29,8 @@ import {
   QuizAttempt,
   Announcement,
   Comment,
+  Notification,
+  NotificationType,
 } from '@/types'
 
 // Helper to convert Firestore timestamp
@@ -576,4 +578,96 @@ export const subscribeToComments = (
 
 export const deleteComment = async (assignmentId: string, commentId: string) => {
   await deleteDoc(doc(db, 'assignments', assignmentId, 'comments', commentId))
+}
+
+
+// ============ NOTIFICATIONS ============
+export const createNotification = async (
+  userId: string,
+  type: NotificationType,
+  title: string,
+  message: string,
+  link?: string
+) => {
+  return addDoc(collection(db, 'users', userId, 'notifications'), {
+    userId,
+    type,
+    title,
+    message,
+    link,
+    isRead: false,
+    createdAt: serverTimestamp(),
+  })
+}
+
+export const createNotificationForAll = async (
+  type: NotificationType,
+  title: string,
+  message: string,
+  link?: string,
+  excludeUserId?: string
+) => {
+  const users = await getUsers()
+  const activeUsers = users.filter(u => u.status === 'active' && u.uid !== excludeUserId)
+  
+  const promises = activeUsers.map(user =>
+    createNotification(user.uid, type, title, message, link)
+  )
+  await Promise.all(promises)
+}
+
+export const getNotifications = async (
+  userId: string,
+  limitCount: number = 20
+): Promise<Notification[]> => {
+  const q = query(
+    collection(db, 'users', userId, 'notifications'),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  )
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: convertTimestamp(doc.data().createdAt),
+  })) as Notification[]
+}
+
+export const subscribeToNotifications = (
+  userId: string,
+  callback: (notifications: Notification[]) => void,
+  limitCount: number = 20
+) => {
+  const q = query(
+    collection(db, 'users', userId, 'notifications'),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  )
+  return onSnapshot(q, (snapshot) => {
+    const notifications = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: convertTimestamp(doc.data().createdAt),
+    })) as Notification[]
+    callback(notifications)
+  })
+}
+
+export const markNotificationAsRead = async (userId: string, notificationId: string) => {
+  await updateDoc(doc(db, 'users', userId, 'notifications', notificationId), {
+    isRead: true,
+  })
+}
+
+export const markAllNotificationsAsRead = async (userId: string) => {
+  const notifications = await getNotifications(userId)
+  const unread = notifications.filter(n => !n.isRead)
+  const promises = unread.map(n =>
+    markNotificationAsRead(userId, n.id)
+  )
+  await Promise.all(promises)
+}
+
+export const deleteNotification = async (userId: string, notificationId: string) => {
+  await deleteDoc(doc(db, 'users', userId, 'notifications', notificationId))
 }
