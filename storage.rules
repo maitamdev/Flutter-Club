@@ -1,0 +1,23 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Submissions folder - users can upload to their own folder
+    match /submissions/{assignmentId}/{userId}/{fileName} {
+      // Users can read their own files, trainers can read all
+      allow read: if isAuthenticated();
+      // Users can only upload to their own folder
+      allow write: if isAuthenticated() && request.auth.uid == userId
+                   && request.resource.size < 10 * 1024 * 1024; // Max 10MB
+    }
+    
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

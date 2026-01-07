@@ -1,0 +1,133 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserData().role == 'admin';
+    }
+    
+    function isTrainer() {
+      return isAuthenticated() && (getUserData().role == 'trainer' || getUserData().role == 'admin');
+    }
+    
+    function isMember() {
+      return isAuthenticated() && getUserData().status == 'active';
+    }
+    
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Anyone authenticated can read user profiles
+      allow read: if isAuthenticated();
+      // Only admin can create/update users, or user can read their own
+      allow create: if isAdmin();
+      allow update: if isAdmin() || isOwner(userId);
+      allow delete: if isAdmin();
+    }
+
+    // Access Requests collection
+    match /accessRequests/{requestId} {
+      // Admin can read all, users can read their own
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      // Authenticated users can create their own request
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+      // Only admin can update (approve/reject)
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Sessions collection
+    match /sessions/{sessionId} {
+      // All active members can read sessions
+      allow read: if isMember();
+      // Only trainers can create/update/delete
+      allow create: if isTrainer();
+      allow update: if isTrainer();
+      allow delete: if isTrainer();
+
+      // Attendance subcollection
+      match /attendance/{attendanceId} {
+        // Members can read all attendance, trainers can read all
+        allow read: if isMember();
+        // Members can only create their own attendance
+        allow create: if isMember() && attendanceId == request.auth.uid;
+        // No one can update or delete attendance (immutable)
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // Attendance Windows collection
+    match /attendanceWindows/{sessionId} {
+      // All members can read (to check if check-in is open)
+      allow read: if isMember();
+      // Only trainers can create/update
+      allow create: if isTrainer();
+      allow update: if isTrainer();
+      allow delete: if isTrainer();
+    }
+
+    // Assignments collection
+    match /assignments/{assignmentId} {
+      // All active members can read
+      allow read: if isMember();
+      // Only trainers can create/update/delete
+      allow create: if isTrainer();
+      allow update: if isTrainer();
+      allow delete: if isTrainer();
+
+      // Submissions subcollection
+      match /submissions/{submissionId} {
+        // Members can read their own, trainers can read all
+        allow read: if isTrainer() || (isMember() && submissionId == request.auth.uid);
+        // Members can only create/update their own submission
+        allow create: if isMember() && submissionId == request.auth.uid;
+        allow update: if (isMember() && submissionId == request.auth.uid && !('score' in request.resource.data)) 
+                      || isTrainer();
+        allow delete: if isAdmin();
+      }
+    }
+
+    // Quizzes collection
+    match /quizzes/{quizId} {
+      // All active members can read
+      allow read: if isMember();
+      // Only trainers can create/update/delete
+      allow create: if isTrainer();
+      allow update: if isTrainer();
+      allow delete: if isTrainer();
+
+      // Quiz Attempts subcollection
+      match /attempts/{attemptId} {
+        // Members can read their own, trainers can read all
+        allow read: if isTrainer() || (isMember() && attemptId == request.auth.uid);
+        // Members can only create their own attempt (once)
+        allow create: if isMember() && attemptId == request.auth.uid;
+        // No updates allowed (immutable)
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // Announcements collection
+    match /announcements/{announcementId} {
+      // All active members can read
+      allow read: if isMember();
+      // Only trainers can create/delete
+      allow create: if isTrainer();
+      allow update: if isTrainer();
+      allow delete: if isTrainer();
+    }
+  }
+}
