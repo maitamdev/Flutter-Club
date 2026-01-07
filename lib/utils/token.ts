@@ -5,11 +5,29 @@ const TOKEN_SECRET = process.env.NEXT_PUBLIC_TOKEN_SECRET || 'default-secret'
 
 // Simple hash function for client-side token generation
 async function simpleHash(message: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(message)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  // Check if crypto.subtle is available (requires HTTPS or localhost)
+  if (typeof crypto !== 'undefined' && crypto.subtle) {
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(message)
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+    } catch (e) {
+      console.warn('crypto.subtle failed, using fallback hash')
+    }
+  }
+  
+  // Fallback: simple hash for environments without crypto.subtle
+  let hash = 0
+  for (let i = 0; i < message.length; i++) {
+    const char = message.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convert to 32bit integer
+  }
+  // Convert to hex and pad to ensure consistent length
+  const hexHash = Math.abs(hash).toString(16).padStart(16, '0')
+  return hexHash + hexHash + hexHash + hexHash // Make it 64 chars like SHA-256
 }
 
 export async function generateToken(

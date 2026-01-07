@@ -2,14 +2,25 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Calendar, Search, MapPin, Users, Clock, Sparkles } from 'lucide-react'
+import { Plus, Calendar, Search, MapPin, Clock, Trash2, Edit } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { getSessions } from '@/lib/firebase/firestore'
+import { getSessions, deleteSession } from '@/lib/firebase/firestore'
 import { Session } from '@/types'
 import { formatDateTime, getRelativeTime } from '@/lib/utils'
 import { EmptyState } from '@/components/layout/empty-state'
@@ -17,11 +28,13 @@ import { TableLoading } from '@/components/layout/loading'
 
 export default function SessionsPage() {
   const { isTrainer } = useAuth()
+  const { toast } = useToast()
   const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all')
   const [mounted, setMounted] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -41,6 +54,19 @@ export default function SessionsPage() {
 
     fetchSessions()
   }, [])
+
+  const handleDelete = async () => {
+    if (!deleteId) return
+    try {
+      await deleteSession(deleteId)
+      setSessions(sessions.filter(s => s.id !== deleteId))
+      toast({ title: 'Đã xóa buổi học' })
+    } catch (error: any) {
+      toast({ title: 'Lỗi', description: error.message, variant: 'destructive' })
+    } finally {
+      setDeleteId(null)
+    }
+  }
 
   const filteredSessions = sessions.filter((session) => {
     const matchesSearch = session.title
@@ -188,9 +214,32 @@ export default function SessionsPage() {
                         <span className="text-sm text-muted-foreground">
                           {formatDateTime(new Date(session.startsAt)).split(',')[0]}
                         </span>
-                        <span className="text-sm font-medium text-violet-600 dark:text-violet-400">
-                          {getRelativeTime(new Date(session.startsAt))}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-violet-600 dark:text-violet-400">
+                            {getRelativeTime(new Date(session.startsAt))}
+                          </span>
+                          {isTrainer && (
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Link href={`/sessions/${session.id}/edit`} onClick={(e) => e.stopPropagation()}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 text-red-500 hover:text-red-600"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  setDeleteId(session.id)
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -200,6 +249,24 @@ export default function SessionsPage() {
           })}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc muốn xóa buổi học này? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

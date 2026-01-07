@@ -66,17 +66,26 @@ export function QRScanner({
   const handleScan = async (decodedText: string) => {
     if (loading) return
 
-    const qrData = parseQRData(decodedText)
-    if (!qrData || qrData.sessionId !== sessionId) {
+    try {
+      const qrData = parseQRData(decodedText)
+      if (!qrData || qrData.sessionId !== sessionId) {
+        toast({
+          title: 'Mã QR không hợp lệ',
+          description: 'Vui lòng quét mã QR của buổi học này',
+          variant: 'destructive',
+        })
+        return
+      }
+
+      await processCheckin(qrData.token, qrData.fallbackCode)
+    } catch (error) {
+      console.error('QR scan error:', error)
       toast({
-        title: 'Mã QR không hợp lệ',
-        description: 'Vui lòng quét mã QR của buổi học này',
+        title: 'Lỗi quét mã',
+        description: 'Vui lòng thử lại hoặc nhập mã thủ công',
         variant: 'destructive',
       })
-      return
     }
-
-    await processCheckin(qrData.token, qrData.fallbackCode)
   }
 
   const handleManualSubmit = async () => {
@@ -119,11 +128,19 @@ export function QRScanner({
       let isValid = false
 
       if (token) {
-        isValid = await validateToken(token, currentWindow.tokenSeed, rotationSec)
+        try {
+          isValid = await validateToken(token, currentWindow.tokenSeed, rotationSec)
+        } catch (e) {
+          console.error('Token validation error:', e)
+        }
       }
 
       if (!isValid && fallbackCode) {
-        isValid = await validateFallbackCode(fallbackCode, currentWindow.tokenSeed, rotationSec)
+        try {
+          isValid = await validateFallbackCode(fallbackCode, currentWindow.tokenSeed, rotationSec)
+        } catch (e) {
+          console.error('Fallback code validation error:', e)
+        }
       }
 
       if (!isValid) {
@@ -157,11 +174,12 @@ export function QRScanner({
 
       // Stop scanner
       if (scannerRef.current?.isScanning) {
-        await scannerRef.current.stop()
+        await scannerRef.current.stop().catch(() => {})
       }
 
       onSuccess()
     } catch (error: any) {
+      console.error('Checkin error:', error)
       toast({
         title: 'Lỗi điểm danh',
         description: error.message || 'Vui lòng thử lại',

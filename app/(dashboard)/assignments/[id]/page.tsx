@@ -56,7 +56,7 @@ import {
   subscribeToComments,
   deleteComment,
 } from '@/lib/firebase/firestore'
-import { uploadSubmissionFile } from '@/lib/firebase/storage'
+import { uploadToCloudinary, CLOUDINARY_CLOUD_NAME } from '@/lib/cloudinary/config'
 import { Assignment, Submission, Comment } from '@/types'
 import { formatDateTime, isOverdue, formatTime } from '@/lib/utils'
 import { PageLoading } from '@/components/layout/loading'
@@ -150,7 +150,16 @@ export default function AssignmentDetailPage() {
       let fileUrl: string | undefined
 
       if (file) {
-        fileUrl = await uploadSubmissionFile(file, assignmentId, user.uid)
+        if (!CLOUDINARY_CLOUD_NAME) {
+          toast({
+            title: 'Lỗi',
+            description: 'Cloudinary chưa được cấu hình. Vui lòng chỉ nhập link GitHub/Demo.',
+            variant: 'destructive',
+          })
+          setSubmitting(false)
+          return
+        }
+        fileUrl = await uploadToCloudinary(file)
       }
 
       await submitAssignment(assignmentId, user.uid, {

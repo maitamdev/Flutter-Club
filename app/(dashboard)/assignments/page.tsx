@@ -2,14 +2,25 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, FileText, Search, Clock, CheckCircle, Award, ArrowRight } from 'lucide-react'
+import { Plus, FileText, Search, Clock, CheckCircle, Award, ArrowRight, Trash2, Edit } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { getAssignments, getUserSubmission } from '@/lib/firebase/firestore'
+import { getAssignments, getUserSubmission, deleteAssignment } from '@/lib/firebase/firestore'
 import { Assignment } from '@/types'
 import { formatDateTime, getRelativeTime, isOverdue } from '@/lib/utils'
 import { EmptyState } from '@/components/layout/empty-state'
@@ -17,12 +28,14 @@ import { TableLoading } from '@/components/layout/loading'
 
 export default function AssignmentsPage() {
   const { user, isTrainer } = useAuth()
+  const { toast } = useToast()
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'open' | 'closed' | 'submitted'>('all')
   const [mounted, setMounted] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -53,6 +66,19 @@ export default function AssignmentsPage() {
 
     fetchData()
   }, [user, isTrainer])
+
+  const handleDelete = async () => {
+    if (!deleteId) return
+    try {
+      await deleteAssignment(deleteId)
+      setAssignments(assignments.filter(a => a.id !== deleteId))
+      toast({ title: 'Đã xóa bài tập' })
+    } catch (error: any) {
+      toast({ title: 'Lỗi', description: error.message, variant: 'destructive' })
+    } finally {
+      setDeleteId(null)
+    }
+  }
 
   const filteredAssignments = assignments.filter((assignment) => {
     const matchesSearch = assignment.title
@@ -222,7 +248,30 @@ export default function AssignmentsPage() {
                           }`}>
                             {overdue ? 'Quá hạn' : getRelativeTime(new Date(assignment.dueAt))}
                           </span>
-                          <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                          <div className="flex items-center gap-1">
+                            {isTrainer && (
+                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Link href={`/assignments/${assignment.id}/edit`} onClick={(e) => e.stopPropagation()}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-8 w-8 text-red-500 hover:text-red-600"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    setDeleteId(assignment.id)
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            )}
+                            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -233,6 +282,24 @@ export default function AssignmentsPage() {
           })}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc muốn xóa bài tập này? Tất cả bài nộp sẽ bị xóa. Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
