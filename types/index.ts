@@ -38,6 +38,7 @@ export interface Session {
   id: string
   title: string
   description: string
+  location?: string
   startsAt: Date
   endsAt: Date
   trainerId: string
