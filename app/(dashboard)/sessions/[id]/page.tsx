@@ -47,7 +47,7 @@ import {
   getUserAttendance,
   updateSession,
 } from '@/lib/firebase/firestore'
-import { uploadSessionMaterial } from '@/lib/firebase/storage'
+import { uploadToCloudinary, CLOUDINARY_CLOUD_NAME } from '@/lib/cloudinary/config'
 import { Session, Attendance, AttendanceWindow } from '@/types'
 import { formatDateTime, formatTime, downloadExcel } from '@/lib/utils'
 import { PageLoading } from '@/components/layout/loading'
@@ -204,7 +204,16 @@ export default function SessionDetailPage() {
       let url = materialUrl.trim()
       
       if (materialFile) {
-        url = await uploadSessionMaterial(materialFile, sessionId)
+        if (!CLOUDINARY_CLOUD_NAME) {
+          toast({
+            title: 'Lỗi',
+            description: 'Cloudinary chưa được cấu hình. Vui lòng nhập URL thay vì upload file.',
+            variant: 'destructive',
+          })
+          setUploadingMaterial(false)
+          return
+        }
+        url = await uploadToCloudinary(materialFile)
       }
 
       const newMaterial = { title: materialTitle.trim(), url }
@@ -454,13 +463,16 @@ export default function SessionDetailPage() {
                             if (e.target.files?.[0]) setMaterialUrl('')
                           }}
                         />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Hỗ trợ: PDF, Word, PowerPoint, hình ảnh, video (tối đa 100MB)
+                        </p>
                       </div>
                       <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                           <span className="w-full border-t" />
                         </div>
                         <div className="relative flex justify-center text-xs">
-                          <span className="bg-card px-2 text-muted-foreground">hoặc</span>
+                          <span className="bg-card px-2 text-muted-foreground">hoặc nhập URL</span>
                         </div>
                       </div>
                       <div>
