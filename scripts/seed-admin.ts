@@ -1,21 +1,38 @@
 /**
  * Script tạo tài khoản Admin đầu tiên
- * Chạy: npx ts-node scripts/seed-admin.ts
- * Hoặc: npx tsx scripts/seed-admin.ts
+ * 
+ * Cách chạy:
+ * 1. Tạo file .env trong thư mục scripts với nội dung:
+ *    FIREBASE_API_KEY=your_api_key
+ *    FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+ *    FIREBASE_PROJECT_ID=your_project_id
+ *    FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+ *    FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+ *    FIREBASE_APP_ID=your_app_id
+ * 
+ * 2. Chạy: npx tsx scripts/seed-admin.ts
  */
 
 import { initializeApp } from 'firebase/app'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore'
 
-// Firebase config - lấy từ .env.local
+// Firebase config - lấy từ environment variables
 const firebaseConfig = {
-  apiKey: "***REMOVED***",
-  authDomain: "flutterclub-26ccb.firebaseapp.com",
-  projectId: "flutterclub-26ccb",
-  storageBucket: "flutterclub-26ccb.firebasestorage.app",
-  messagingSenderId: "69373921672",
-  appId: "1:69373921672:web:41f2a51582a999adf2123d"
+  apiKey: process.env.FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID || process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+}
+
+// Validate config
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.error('❌ Lỗi: Thiếu Firebase config!')
+  console.error('Vui lòng tạo file .env hoặc set environment variables')
+  console.error('Xem hướng dẫn trong comment đầu file')
+  process.exit(1)
 }
 
 // ============ CẤU HÌNH ADMIN ============
@@ -33,7 +50,6 @@ async function seedAdmin() {
   const db = getFirestore(app)
 
   try {
-    // Thử tạo user mới
     let uid: string
 
     try {
@@ -42,7 +58,6 @@ async function seedAdmin() {
       console.log('✅ Đã tạo tài khoản Firebase Auth')
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
-        // User đã tồn tại, đăng nhập để lấy uid
         console.log('⚠️  Email đã tồn tại, đang cập nhật role...')
         const userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
         uid = userCredential.user.uid
@@ -51,7 +66,6 @@ async function seedAdmin() {
       }
     }
 
-    // Tạo/cập nhật document trong Firestore
     await setDoc(doc(db, 'users', uid), {
       name: ADMIN_NAME,
       email: ADMIN_EMAIL,
