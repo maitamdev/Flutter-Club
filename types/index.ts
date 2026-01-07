@@ -136,6 +136,16 @@ export interface Announcement {
   createdAt: Date
 }
 
+// Comment Types
+export interface Comment {
+  id: string
+  uid: string
+  userName: string
+  userPhotoURL?: string
+  content: string
+  createdAt: Date
+}
+
 // Dashboard Stats
 export interface DashboardStats {
   totalMembers: number

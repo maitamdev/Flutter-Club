@@ -28,6 +28,7 @@ import {
   Quiz,
   QuizAttempt,
   Announcement,
+  Comment,
 } from '@/types'
 
 // Helper to convert Firestore timestamp
@@ -529,4 +530,50 @@ export const subscribeToAnnouncements = (
     })) as Announcement[]
     callback(announcements)
   })
+}
+
+// ============ COMMENTS ============
+export const addComment = async (
+  assignmentId: string,
+  data: Omit<Comment, 'id' | 'createdAt'>
+) => {
+  return addDoc(collection(db, 'assignments', assignmentId, 'comments'), {
+    ...data,
+    createdAt: serverTimestamp(),
+  })
+}
+
+export const getComments = async (assignmentId: string): Promise<Comment[]> => {
+  const q = query(
+    collection(db, 'assignments', assignmentId, 'comments'),
+    orderBy('createdAt', 'asc')
+  )
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: convertTimestamp(doc.data().createdAt),
+  })) as Comment[]
+}
+
+export const subscribeToComments = (
+  assignmentId: string,
+  callback: (comments: Comment[]) => void
+) => {
+  const q = query(
+    collection(db, 'assignments', assignmentId, 'comments'),
+    orderBy('createdAt', 'asc')
+  )
+  return onSnapshot(q, (snapshot) => {
+    const comments = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: convertTimestamp(doc.data().createdAt),
+    })) as Comment[]
+    callback(comments)
+  })
+}
+
+export const deleteComment = async (assignmentId: string, commentId: string) => {
+  await deleteDoc(doc(db, 'assignments', assignmentId, 'comments', commentId))
 }

@@ -17,8 +17,14 @@ import {
   Loader2,
   Play,
   Square,
+  Upload,
+  Trash2,
+  Video,
+  File,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -39,7 +45,9 @@ import {
   endAttendanceWindow,
   subscribeToAttendance,
   getUserAttendance,
+  updateSession,
 } from '@/lib/firebase/firestore'
+import { uploadSessionMaterial } from '@/lib/firebase/storage'
 import { Session, Attendance, AttendanceWindow } from '@/types'
 import { formatDateTime, formatTime, downloadExcel } from '@/lib/utils'
 import { PageLoading } from '@/components/layout/loading'
@@ -59,6 +67,10 @@ export default function SessionDetailPage() {
   const [loading, setLoading] = useState(true)
   const [startingCheckin, setStartingCheckin] = useState(false)
   const [showScanner, setShowScanner] = useState(false)
+  const [uploadingMaterial, setUploadingMaterial] = useState(false)
+  const [materialTitle, setMaterialTitle] = useState('')
+  const [materialFile, setMaterialFile] = useState<File | null>(null)
+  const [materialUrl, setMaterialUrl] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -166,6 +178,84 @@ export default function SessionDetailPage() {
     if (user) {
       getUserAttendance(sessionId, user.uid).then(setUserAttendance)
     }
+  }
+
+  const handleAddMaterial = async () => {
+    if (!materialTitle.trim()) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng nhập tiêu đề tài liệu',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (!materialFile && !materialUrl.trim()) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng upload file hoặc nhập URL',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setUploadingMaterial(true)
+    try {
+      let url = materialUrl.trim()
+      
+      if (materialFile) {
+        url = await uploadSessionMaterial(materialFile, sessionId)
+      }
+
+      const newMaterial = { title: materialTitle.trim(), url }
+      const updatedMaterials = [...(session?.materials || []), newMaterial]
+      
+      await updateSession(sessionId, { materials: updatedMaterials })
+      
+      setSession((prev) => prev ? { ...prev, materials: updatedMaterials } : null)
+      setMaterialTitle('')
+      setMaterialFile(null)
+      setMaterialUrl('')
+      
+      toast({
+        title: 'Thêm tài liệu thành công',
+      })
+    } catch (error: any) {
+      toast({
+        title: 'Lỗi',
+        description: error.message,
+        variant: 'destructive',
+      })
+    } finally {
+      setUploadingMaterial(false)
+    }
+  }
+
+  const handleRemoveMaterial = async (index: number) => {
+    if (!session) return
+    
+    try {
+      const updatedMaterials = session.materials.filter((_, i) => i !== index)
+      await updateSession(sessionId, { materials: updatedMaterials })
+      setSession((prev) => prev ? { ...prev, materials: updatedMaterials } : null)
+      toast({
+        title: 'Đã xóa tài liệu',
+      })
+    } catch (error: any) {
+      toast({
+        title: 'Lỗi',
+        description: error.message,
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const getFileIcon = (url: string) => {
+    const lower = url.toLowerCase()
+    if (lower.includes('youtube') || lower.includes('youtu.be') || lower.match(/\.(mp4|webm|mov)$/)) {
+      return <Video className="h-4 w-4 text-red-500" />
+    }
+    return <File className="h-4 w-4 text-blue-500" />
   }
 
   if (loading) {
@@ -301,21 +391,102 @@ export default function SessionDetailPage() {
                   <div>
                     <h4 className="font-medium mb-3 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      Tài liệu
+                      Tài liệu ({session.materials.length})
                     </h4>
                     <div className="space-y-2">
                       {session.materials.map((material, index) => (
-                        <a
+                        <div
                           key={index}
-                          href={material.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                          className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                         >
-                          <ExternalLink className="h-4 w-4" />
-                          {material.title}
-                        </a>
+                          <a
+                            href={material.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline flex-1"
+                          >
+                            {getFileIcon(material.url)}
+                            {material.title}
+                          </a>
+                          {isTrainer && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-100"
+                              onClick={() => handleRemoveMaterial(index)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Add Material Form (Trainer only) */}
+              {isTrainer && (
+                <>
+                  <Separator />
+                  <div>
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Thêm tài liệu mới
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="materialTitle">Tiêu đề</Label>
+                        <Input
+                          id="materialTitle"
+                          placeholder="VD: Slide bài giảng tuần 1"
+                          value={materialTitle}
+                          onChange={(e) => setMaterialTitle(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="materialFile">Upload file</Label>
+                        <Input
+                          id="materialFile"
+                          type="file"
+                          onChange={(e) => {
+                            setMaterialFile(e.target.files?.[0] || null)
+                            if (e.target.files?.[0]) setMaterialUrl('')
+                          }}
+                        />
+                      </div>
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                          <span className="bg-card px-2 text-muted-foreground">hoặc</span>
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="materialUrl">URL (YouTube, Google Drive, ...)</Label>
+                        <Input
+                          id="materialUrl"
+                          placeholder="https://..."
+                          value={materialUrl}
+                          onChange={(e) => {
+                            setMaterialUrl(e.target.value)
+                            if (e.target.value) setMaterialFile(null)
+                          }}
+                        />
+                      </div>
+                      <Button
+                        onClick={handleAddMaterial}
+                        disabled={uploadingMaterial}
+                        className="w-full"
+                      >
+                        {uploadingMaterial ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Upload className="mr-2 h-4 w-4" />
+                        )}
+                        Thêm tài liệu
+                      </Button>
                     </div>
                   </div>
                 </>

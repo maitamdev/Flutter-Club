@@ -16,6 +16,9 @@ import {
   Loader2,
   Download,
   Star,
+  MessageCircle,
+  Send,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,10 +52,13 @@ import {
   getSubmissions,
   gradeSubmission,
   subscribeToSubmissions,
+  addComment,
+  subscribeToComments,
+  deleteComment,
 } from '@/lib/firebase/firestore'
 import { uploadSubmissionFile } from '@/lib/firebase/storage'
-import { Assignment, Submission } from '@/types'
-import { formatDateTime, isOverdue } from '@/lib/utils'
+import { Assignment, Submission, Comment } from '@/types'
+import { formatDateTime, isOverdue, formatTime } from '@/lib/utils'
 import { PageLoading } from '@/components/layout/loading'
 import { submissionSchema, SubmissionFormData, gradeSchema, GradeFormData } from '@/lib/validations'
 
@@ -72,6 +78,9 @@ export default function AssignmentDetailPage() {
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false)
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
   const [grading, setGrading] = useState(false)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [newComment, setNewComment] = useState('')
+  const [sendingComment, setSendingComment] = useState(false)
 
   const {
     register,
@@ -126,6 +135,12 @@ export default function AssignmentDetailPage() {
     const unsubscribe = subscribeToSubmissions(assignmentId, setSubmissions)
     return () => unsubscribe()
   }, [assignmentId, isTrainer])
+
+  // Subscribe to realtime comments
+  useEffect(() => {
+    const unsubscribe = subscribeToComments(assignmentId, setComments)
+    return () => unsubscribe()
+  }, [assignmentId])
 
   const onSubmit = async (data: SubmissionFormData) => {
     if (!user) return
@@ -204,6 +219,41 @@ export default function AssignmentDetailPage() {
     setGradeDialogOpen(true)
   }
 
+  const handleSendComment = async () => {
+    if (!user || !newComment.trim()) return
+
+    setSendingComment(true)
+    try {
+      await addComment(assignmentId, {
+        uid: user.uid,
+        userName: user.name,
+        userPhotoURL: user.photoURL,
+        content: newComment.trim(),
+      })
+      setNewComment('')
+    } catch (error: any) {
+      toast({
+        title: 'Gửi bình luận thất bại',
+        description: error.message,
+        variant: 'destructive',
+      })
+    } finally {
+      setSendingComment(false)
+    }
+  }
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment(assignmentId, commentId)
+    } catch (error: any) {
+      toast({
+        title: 'Xóa bình luận thất bại',
+        description: error.message,
+        variant: 'destructive',
+      })
+    }
+  }
+
   if (loading) {
     return <PageLoading />
   }
@@ -277,6 +327,91 @@ export default function AssignmentDetailPage() {
                   ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+
+          {/* Comments Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Thảo luận ({comments.length})
+              </CardTitle>
+              <CardDescription>
+                Đặt câu hỏi hoặc thảo luận về bài tập
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Comments List */}
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {comments.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    Chưa có bình luận nào
+                  </p>
+                ) : (
+                  comments.map((comment) => (
+                    <div
+                      key={comment.id}
+                      className="flex gap-3 p-3 rounded-lg bg-muted/50"
+                    >
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-sm font-medium shrink-0">
+                        {comment.userName?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-medium text-sm">{comment.userName}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {formatTime(new Date(comment.createdAt))}
+                            </span>
+                            {(user?.uid === comment.uid || isTrainer) && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-red-500 hover:text-red-600"
+                                onClick={() => handleDeleteComment(comment.id)}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-sm mt-1 whitespace-pre-wrap break-words">
+                          {comment.content}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Add Comment Form */}
+              <div className="flex gap-2 pt-4 border-t">
+                <Textarea
+                  placeholder="Viết bình luận..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  rows={2}
+                  className="flex-1 resize-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleSendComment()
+                    }
+                  }}
+                />
+                <Button
+                  onClick={handleSendComment}
+                  disabled={sendingComment || !newComment.trim()}
+                  className="self-end"
+                >
+                  {sendingComment ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

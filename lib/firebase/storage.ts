@@ -21,3 +21,12 @@ export const uploadSubmissionFile = async (
   const path = `submissions/${assignmentId}/${uid}/${Date.now()}.${ext}`
   return uploadFile(file, path)
 }
+
+export const uploadSessionMaterial = async (
+  file: File,
+  sessionId: string
+): Promise<string> => {
+  const ext = file.name.split('.').pop()
+  const path = `materials/${sessionId}/${Date.now()}-${file.name}`
+  return uploadFile(file, path)
+}

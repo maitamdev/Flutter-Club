@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   onAuthStateChanged,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   User as FirebaseUser,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
@@ -64,4 +65,8 @@ export const createUserDocument = async (
 export const checkUserExists = async (uid: string): Promise<boolean> => {
   const userDoc = await getDoc(doc(db, 'users', uid))
   return userDoc.exists()
+}
+
+export const sendPasswordResetEmail = async (email: string): Promise<void> => {
+  await firebaseSendPasswordResetEmail(auth, email)
 }
