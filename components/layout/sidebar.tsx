@@ -21,8 +21,26 @@ import {
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { Button } from '@/components/ui/button'
+import { 
+  subscribeToAccessRequests, 
+  getSessions, 
+  getAssignments, 
+  getQuizzes,
+  subscribeToAnnouncements,
+  getUsers 
+} from '@/lib/firebase/firestore'
+import { isOverdue } from '@/lib/utils'
 
-const menuItems = [
+interface MenuItemType {
+  title: string
+  href: string
+  icon: any
+  roles: string[]
+  gradient: string
+  countKey?: string
+}
+
+const menuItems: MenuItemType[] = [
   {
     title: 'Dashboard',
     href: '/dashboard',
@@ -36,6 +54,7 @@ const menuItems = [
     icon: Calendar,
     roles: ['admin', 'trainer', 'member'],
     gradient: 'from-violet-500 to-purple-500',
+    countKey: 'sessions',
   },
   {
     title: 'Bài tập',
@@ -43,6 +62,7 @@ const menuItems = [
     icon: FileText,
     roles: ['admin', 'trainer', 'member'],
     gradient: 'from-emerald-500 to-teal-500',
+    countKey: 'assignments',
   },
   {
     title: 'Quiz',
@@ -50,6 +70,7 @@ const menuItems = [
     icon: HelpCircle,
     roles: ['admin', 'trainer', 'member'],
     gradient: 'from-orange-500 to-amber-500',
+    countKey: 'quizzes',
   },
   {
     title: 'Thông báo',
@@ -57,6 +78,7 @@ const menuItems = [
     icon: Bell,
     roles: ['admin', 'trainer', 'member'],
     gradient: 'from-pink-500 to-rose-500',
+    countKey: 'announcements',
   },
   {
     title: 'Thành viên',
@@ -64,6 +86,7 @@ const menuItems = [
     icon: Users,
     roles: ['admin'],
     gradient: 'from-indigo-500 to-blue-500',
+    countKey: 'members',
   },
   {
     title: 'Yêu cầu tham gia',
@@ -71,12 +94,30 @@ const menuItems = [
     icon: UserPlus,
     roles: ['admin'],
     gradient: 'from-cyan-500 to-teal-500',
+    countKey: 'requests',
   },
 ]
+
+interface Counts {
+  sessions: number
+  assignments: number
+  quizzes: number
+  announcements: number
+  members: number
+  requests: number
+}
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [counts, setCounts] = useState<Counts>({
+    sessions: 0,
+    assignments: 0,
+    quizzes: 0,
+    announcements: 0,
+    members: 0,
+    requests: 0,
+  })
   const pathname = usePathname()
   const { user, isAdmin, isTrainer } = useAuth()
 
@@ -94,12 +135,109 @@ export function Sidebar() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Fetch counts
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        // Sessions - upcoming
+        const sessions = await getSessions()
+        const upcomingSessions = sessions.filter(s => new Date(s.startsAt) > new Date()).length
+        
+        // Assignments - open (not overdue)
+        const assignments = await getAssignments()
+        const openAssignments = assignments.filter(a => !isOverdue(new Date(a.dueAt))).length
+        
+        // Quizzes - active
+        const quizzes = await getQuizzes()
+        const now = new Date()
+        const activeQuizzes = quizzes.filter(q => {
+          const start = new Date(q.startsAt)
+          const end = new Date(q.endsAt)
+          return q.isActive && now >= start && now <= end
+        }).length
+
+        // Members (only for admin)
+        let membersCount = 0
+        if (isAdmin) {
+          const users = await getUsers()
+          membersCount = users.filter(u => u.status === 'active').length
+        }
+
+        setCounts(prev => ({
+          ...prev,
+          sessions: upcomingSessions,
+          assignments: openAssignments,
+          quizzes: activeQuizzes,
+          members: membersCount,
+        }))
+      } catch (error) {
+        console.error('Error fetching counts:', error)
+      }
+    }
+
+    fetchCounts()
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchCounts, 30000)
+    return () => clearInterval(interval)
+  }, [isAdmin])
+
+  // Subscribe to realtime updates
+  useEffect(() => {
+    // Announcements - realtime
+    const unsubAnnouncements = subscribeToAnnouncements((announcements) => {
+      // Count announcements from last 7 days
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 7)
+      const recentCount = announcements.filter(a => new Date(a.createdAt) > weekAgo).length
+      setCounts(prev => ({ ...prev, announcements: recentCount }))
+    }, 50)
+
+    return () => {
+      unsubAnnouncements()
+    }
+  }, [])
+
+  // Subscribe to access requests (admin only)
+  useEffect(() => {
+    if (!isAdmin) return
+
+    const unsubRequests = subscribeToAccessRequests('pending', (requests) => {
+      setCounts(prev => ({ ...prev, requests: requests.length }))
+    })
+
+    return () => unsubRequests()
+  }, [isAdmin])
+
   const filteredItems = menuItems.filter((item) => {
     if (item.roles.includes('admin') && isAdmin) return true
     if (item.roles.includes('trainer') && isTrainer) return true
     if (item.roles.includes('member')) return true
     return false
   })
+
+  const getCount = (countKey?: string): number => {
+    if (!countKey) return 0
+    return counts[countKey as keyof Counts] || 0
+  }
+
+  const getBadgeColor = (countKey?: string): string => {
+    switch (countKey) {
+      case 'requests':
+        return 'bg-red-500'
+      case 'announcements':
+        return 'bg-pink-500'
+      case 'sessions':
+        return 'bg-violet-500'
+      case 'assignments':
+        return 'bg-emerald-500'
+      case 'quizzes':
+        return 'bg-orange-500'
+      case 'members':
+        return 'bg-indigo-500'
+      default:
+        return 'bg-blue-500'
+    }
+  }
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -149,12 +287,16 @@ export function Sidebar() {
         {filteredItems.map((item, index) => {
           const isActive = pathname === item.href || 
             (item.href !== '/dashboard' && pathname.startsWith(item.href))
+          const count = getCount(item.countKey)
+          const showBadge = count > 0
+          const badgeColor = getBadgeColor(item.countKey)
+          
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative',
                 isActive
                   ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200',
@@ -163,7 +305,7 @@ export function Sidebar() {
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className={cn(
-                'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
+                'relative flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
                 isActive 
                   ? `bg-gradient-to-br ${item.gradient} shadow-lg` 
                   : 'bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'
@@ -172,12 +314,31 @@ export function Sidebar() {
                   'h-4 w-4 transition-colors',
                   isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
                 )} />
+                {/* Badge on icon when collapsed */}
+                {showBadge && collapsed && !mobileOpen && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center">
+                    <span className={cn('relative flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full text-[10px] font-bold text-white', badgeColor)}>
+                      {count > 99 ? '99+' : count}
+                    </span>
+                  </span>
+                )}
               </div>
               {(!collapsed || mobileOpen) && (
-                <span className="truncate">{item.title}</span>
-              )}
-              {isActive && (!collapsed || mobileOpen) && (
-                <Sparkles className="h-3 w-3 ml-auto text-blue-500 animate-pulse" />
+                <>
+                  <span className="truncate flex-1">{item.title}</span>
+                  {/* Badge when expanded */}
+                  {showBadge && (
+                    <span className={cn(
+                      'flex h-5 min-w-5 px-1.5 items-center justify-center rounded-full text-[11px] font-bold text-white',
+                      badgeColor
+                    )}>
+                      {count > 99 ? '99+' : count}
+                    </span>
+                  )}
+                  {isActive && !showBadge && (
+                    <Sparkles className="h-3 w-3 ml-auto text-blue-500 animate-pulse" />
+                  )}
+                </>
               )}
             </Link>
           )
@@ -211,6 +372,9 @@ export function Sidebar() {
     </div>
   )
 
+  // Calculate total notifications for mobile button
+  const totalNotifications = counts.requests
+
   return (
     <>
       {/* Mobile Menu Button */}
@@ -221,6 +385,15 @@ export function Sidebar() {
         className="fixed top-4 left-4 z-50 lg:hidden h-11 w-11 rounded-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-gray-200/50 dark:border-gray-700/50 shadow-lg"
       >
         <Menu className="h-5 w-5" />
+        {/* Badge on mobile menu button - only show pending requests */}
+        {isAdmin && totalNotifications > 0 && (
+          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+            <span className="relative flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+              {totalNotifications > 9 ? '9+' : totalNotifications}
+            </span>
+          </span>
+        )}
       </Button>
 
       {/* Mobile Overlay */}
