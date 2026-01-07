@@ -265,3 +265,211 @@
     radial-gradient(at 0% 50%, hsla(269, 100%, 77%, 0.05) 0px, transparent 50%),
     radial-gradient(at 80% 50%, hsla(340, 100%, 76%, 0.05) 0px, transparent 50%);
 }
+
+/* Aurora background effect */
+.aurora-bg {
+  background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0c4a6e, #134e4a, #1e1b4b, #0f172a);
+  background-size: 400% 400%;
+  animation: aurora 15s ease infinite;
+}
+
+@keyframes aurora {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Floating particles */
+.particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: particle-float 20s infinite;
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Glow button effect */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #06b6d4, #3b82f6, #8b5cf6, #06b6d4);
+  background-size: 400% 400%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: glow-rotate 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-glow:hover::before {
+  opacity: 1;
+}
+
+@keyframes glow-rotate {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+
+/* Card shine effect */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(45deg);
+  transition: all 0.5s;
+  opacity: 0;
+}
+
+.card-shine:hover::after {
+  animation: shine 0.75s forwards;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* Typing cursor */
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* 3D card tilt */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(10px);
+}
+
+/* Gradient border animation */
+.gradient-border-animated {
+  position: relative;
+  background: linear-gradient(var(--background), var(--background)) padding-box,
+              linear-gradient(var(--angle, 0deg), #06b6d4, #3b82f6, #8b5cf6, #ec4899, #06b6d4) border-box;
+  border: 2px solid transparent;
+  animation: border-rotate 4s linear infinite;
+}
+
+@keyframes border-rotate {
+  to { --angle: 360deg; }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Text gradient animation */
+.text-gradient-animated {
+  background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #06b6d4);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-gradient 3s linear infinite;
+}
+
+@keyframes text-gradient {
+  to { background-position: 200% center; }
+}
+
+/* Ripple effect */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.3) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.ripple:hover::after {
+  opacity: 1;
+}
+
+/* Stagger animation for lists */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: stagger-in 0.5s ease forwards;
+}
+
+@keyframes stagger-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Noise texture overlay */
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}

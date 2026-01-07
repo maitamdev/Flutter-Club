@@ -8,7 +8,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      'rounded-2xl border bg-card text-card-foreground shadow-sm transition-all duration-200',
+      'rounded-2xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-lg',
       className
     )}
     {...props}
@@ -75,4 +75,35 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = 'CardFooter'
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+// Premium Card variants
+const GlassCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 shadow-xl shadow-gray-200/20 dark:shadow-black/20 transition-all duration-300',
+      className
+    )}
+    {...props}
+  />
+))
+GlassCard.displayName = 'GlassCard'
+
+const GradientCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { gradient?: string }
+>(({ className, gradient = 'from-blue-500 to-cyan-500', ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      `rounded-2xl bg-gradient-to-br ${gradient} text-white shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1`,
+      className
+    )}
+    {...props}
+  />
+))
+GradientCard.displayName = 'GradientCard'
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, GlassCard, GradientCard }
