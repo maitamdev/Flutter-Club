@@ -27,15 +27,17 @@ export const FloatingRobot = () => {
         const move = async () => {
             if (isDragging || isHovered || !isVisible) return
 
-            // Random movement relative to its bottom-right starting point
-            const nextX = (Math.random() - 1) * (window.innerWidth - 200)
-            const nextY = (Math.random() - 1) * (window.innerHeight - 200)
+            // Calculate random target within screen bounds
+            const maxX = window.innerWidth - 150
+            const maxY = window.innerHeight - 150
+            const nextX = Math.random() * maxX
+            const nextY = Math.random() * maxY
 
             await controls.start({
-                x: nextX,
-                y: nextY,
+                left: nextX,
+                top: nextY,
                 transition: {
-                    duration: Math.random() * 5 + 8,
+                    duration: Math.random() * 5 + 10,
                     ease: "easeInOut"
                 }
             })
@@ -53,13 +55,13 @@ export const FloatingRobot = () => {
     return (
         <AnimatePresence>
             <motion.div
-                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={controls}
+                initial={{ opacity: 0, scale: 0, left: '80%', top: '80%' }}
                 exit={{ opacity: 0, scale: 0 }}
-                className="fixed bottom-10 right-10 z-[9999] pointer-events-none"
+                className="fixed z-[9999] pointer-events-none"
+                style={{ width: 120, height: 120 }}
             >
                 <motion.div
-                    animate={controls}
                     drag
                     dragMomentum={false}
                     onDragStart={() => {
@@ -75,13 +77,14 @@ export const FloatingRobot = () => {
                         setIsHovered(false)
                         setTimeout(startRandomMovement, 1000)
                     }}
-                    className="pointer-events-auto cursor-grab active:cursor-grabbing group relative w-[120px] h-[120px]"
+                    className="pointer-events-auto cursor-grab active:cursor-grabbing group relative w-full h-full"
                 >
                     {/* Robot Body */}
                     <motion.div
                         animate={{
-                            y: [0, -10, 0],
-                            rotate: [0, 2, -2, 0]
+                            y: [0, -12, 0],
+                            rotate: isDragging ? 0 : [0, 5, -5, 0],
+                            scale: isHovered ? 1.1 : 1
                         }}
                         transition={{
                             duration: 4,
@@ -94,11 +97,15 @@ export const FloatingRobot = () => {
                         <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full scale-75 animate-pulse" />
 
                         {/* The Mascot Image */}
-                        <div className="relative w-full h-full rounded-full overflow-hidden border border-white/10 shadow-lg bg-black/40 backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
-                            <img
+                        <div className="relative w-full h-full rounded-full overflow-hidden border border-white/10 shadow-lg bg-black/40 backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300">
+                            <motion.img
                                 src="/images/robot-mascot.png"
                                 alt="AI Mascot"
-                                className="w-full h-full object-cover scale-110 select-nonepointer-events-none"
+                                animate={isHovered ? {
+                                    rotate: [0, 15, -15, 15, 0],
+                                } : {}}
+                                transition={{ duration: 1, repeat: isHovered ? Infinity : 0 }}
+                                className="w-full h-full object-cover scale-110 select-none pointer-events-none"
                                 style={{ mixBlendMode: 'lighten' }}
                                 draggable={false}
                             />
@@ -107,10 +114,10 @@ export const FloatingRobot = () => {
                         {/* Speech Bubble */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0 }}
-                            animate={(isHovered || isDragging) ? { opacity: 1, scale: 1, y: -40 } : { opacity: 0, scale: 0, y: 0 }}
-                            className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-1.5 rounded-2xl text-xs font-bold shadow-xl border border-blue-500/30 whitespace-nowrap z-50 pointer-events-none transition-all"
+                            animate={(isHovered || isDragging) ? { opacity: 1, scale: 1, y: -50 } : { opacity: 0, scale: 0, y: 0 }}
+                            className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-2xl border border-blue-500/30 whitespace-nowrap z-50 pointer-events-none transition-all"
                         >
-                            Chào chủ nhân! ✨
+                            Chào bạn! ✨
                             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-inherit rotate-45 border-b border-r border-blue-500/30" />
                         </motion.div>
 
