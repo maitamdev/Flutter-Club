@@ -12,8 +12,18 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'WebOOM DHV TEC - Quản lý CLB Flutter',
+  title: 'WebOOM HVUH TEC - Quản lý CLB Flutter',
   description: 'Hệ thống quản lý Câu lạc bộ Flutter - Khoa Kỹ Thuật Công Nghệ - ĐH Hùng Vương TPHCM',
+  openGraph: {
+    title: 'WebOOM HVUH TEC - Quản lý CLB Flutter',
+    description: 'Hệ thống quản lý Câu lạc bộ Flutter - Khoa Kỹ Thuật Công Nghệ - ĐH Hùng Vương TPHCM',
+    siteName: 'WebOOM HVUH TEC',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'WebOOM HVUH TEC - Quản lý CLB Flutter',
+    description: 'Hệ thống quản lý Câu lạc bộ Flutter - Khoa Kỹ Thuật Công Nghệ - ĐH Hùng Vương TPHCM',
+  },
 }
 
 export default function RootLayout({

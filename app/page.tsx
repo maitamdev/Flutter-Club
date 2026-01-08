@@ -37,9 +37,9 @@ export default function HomePage() {
       <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
-            src="/dhv.jpg" 
-            alt="DHV Campus" 
+          <img
+            src="/hvuh.jpg"
+            alt="HVUH Campus"
             className="w-full h-full object-cover"
           />
           {/* Overlay Gradient */}
@@ -63,7 +63,7 @@ export default function HomePage() {
           <div className={`transition-all duration-1000 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <h1 className="text-5xl xl:text-6xl font-black mb-4 leading-tight">
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                WebOOM DHV TEC
+                WebOOM HVUH TEC
               </span>
             </h1>
             <p className="text-xl xl:text-2xl text-gray-300 mb-2">
@@ -114,9 +114,9 @@ export default function HomePage() {
       <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6 lg:p-12 relative">
         {/* Mobile Background */}
         <div className="absolute inset-0 lg:hidden">
-          <img 
-            src="/dhv.jpg" 
-            alt="DHV Campus" 
+          <img
+            src="/hvuh.jpg"
+            alt="HVUH Campus"
             className="w-full h-full object-cover opacity-20"
           />
           <div className="absolute inset-0 bg-[#0a0a1a]/90" />
@@ -129,7 +129,7 @@ export default function HomePage() {
               <GraduationCap className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              WebOOM DHV TEC
+              WebOOM HVUH TEC
             </h1>
             <p className="text-gray-500 text-sm mt-1">ĐH Hùng Vương TPHCM</p>
           </div>
@@ -138,22 +138,20 @@ export default function HomePage() {
           <div className="flex bg-gray-800/50 rounded-2xl p-1.5 mb-8 backdrop-blur-sm">
             <button
               onClick={() => setActiveTab('member')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all ${
-                activeTab === 'member'
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all ${activeTab === 'member'
                   ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/25'
                   : 'text-gray-400 hover:text-white'
-              }`}
+                }`}
             >
               <Users className="h-5 w-5" />
               Thành viên
             </button>
             <button
               onClick={() => setActiveTab('admin')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all ${
-                activeTab === 'admin'
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all ${activeTab === 'admin'
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
                   : 'text-gray-400 hover:text-white'
-              }`}
+                }`}
             >
               <Shield className="h-5 w-5" />
               Quản trị
@@ -219,7 +217,7 @@ export default function HomePage() {
 
           {/* Footer */}
           <p className="text-center text-gray-600 text-sm mt-8">
-            © 2024 WebOOM DHV TEC • ĐH Hùng Vương TPHCM
+            © 2024 WebOOM HVUH TEC • ĐH Hùng Vương TPHCM
           </p>
         </div>
       </div>

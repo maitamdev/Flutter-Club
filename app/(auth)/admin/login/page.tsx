@@ -70,9 +70,9 @@ export default function AdminLoginPage() {
       {/* Left Side - Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 via-purple-800/80 to-pink-900/90 z-10" />
-        <img 
-          src="/dhv.jpg" 
-          alt="DHV Campus" 
+        <img
+          src="/dhv.jpg"
+          alt="DHV Campus"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="relative z-20 flex flex-col justify-center px-12 xl:px-20">

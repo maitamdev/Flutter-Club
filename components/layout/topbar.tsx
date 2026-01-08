@@ -77,8 +77,8 @@ export function Topbar() {
                 <AvatarFallback className={cn(
                   'text-white text-sm font-bold',
                   user?.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                  user?.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
-                  'bg-gradient-to-br from-emerald-500 to-teal-500'
+                    user?.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                      'bg-gradient-to-br from-emerald-500 to-teal-500'
                 )}>
                   {user?.name ? getInitials(user.name) : 'U'}
                 </AvatarFallback>
@@ -92,8 +92,8 @@ export function Topbar() {
                 <AvatarFallback className={cn(
                   'text-white font-bold',
                   user?.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                  user?.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
-                  'bg-gradient-to-br from-emerald-500 to-teal-500'
+                    user?.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                      'bg-gradient-to-br from-emerald-500 to-teal-500'
                 )}>
                   {user?.name ? getInitials(user.name) : 'U'}
                 </AvatarFallback>
@@ -104,14 +104,14 @@ export function Topbar() {
                 <span className={cn(
                   'inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-medium',
                   user?.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
-                  user?.role === 'trainer' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                  'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                    user?.role === 'trainer' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                 )}>
                   {user?.role === 'admin' ? '👑 Admin' : user?.role === 'trainer' ? '🎓 Trainer' : '👤 Member'}
                 </span>
               </div>
             </div>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => router.push('/profile')}
               className="flex items-center gap-2 p-3 rounded-lg cursor-pointer"
             >
@@ -120,7 +120,7 @@ export function Topbar() {
               </div>
               <span>Hồ sơ cá nhân</span>
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="flex items-center gap-2 p-3 rounded-lg cursor-pointer"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
@@ -129,8 +129,8 @@ export function Topbar() {
               <span>Cài đặt</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="my-2" />
-            <DropdownMenuItem 
-              onClick={handleLogout} 
+            <DropdownMenuItem
+              onClick={handleLogout}
               className="flex items-center gap-2 p-3 rounded-lg cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
