@@ -147,7 +147,7 @@ export default function DashboardPage() {
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-bold mb-6 tracking-tight animate-slide-in leading-[1.05]">
-              Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-300">{user?.name?.split(' ').pop()}!</span>
+              Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-300">{user?.name?.trim().split(/\s+/).pop() || "Member"}!</span>
             </h1>
 
             <p className="text-gray-300 text-lg lg:text-xl max-w-xl leading-relaxed mb-10 delay-100 animate-slide-in font-medium opacity-90">
