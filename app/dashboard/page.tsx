@@ -102,15 +102,15 @@ export default function DashboardPage() {
     },
     ...(isAdmin
       ? [
-          {
-            title: 'Thành viên',
-            value: stats.totalMembers,
-            icon: Users,
-            gradient: 'from-blue-500 to-cyan-600',
-            bgGradient: 'from-blue-500/10 to-cyan-500/10',
-            href: '/members',
-          },
-        ]
+        {
+          title: 'Thành viên',
+          value: stats.totalMembers,
+          icon: Users,
+          gradient: 'from-blue-500 to-cyan-600',
+          bgGradient: 'from-blue-500/10 to-cyan-500/10',
+          href: '/members',
+        },
+      ]
       : []),
   ]
 
@@ -124,51 +124,61 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Welcome Section */}
-      <div className={`relative overflow-hidden rounded-2xl p-6 lg:p-8 text-white transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+      <div className={`relative overflow-hidden rounded-3xl transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700" />
-        
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-blue-600 to-violet-700" />
+
         {/* Animated background shapes */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl" />
         </div>
-        
+
         {/* Pattern overlay */}
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }} />
-        
-        <div className="relative">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-sm mb-4">
+
+        <div className="relative p-6 lg:p-10 text-white">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-sm font-medium mb-6 animate-fade-in">
                 <Sparkles className="h-4 w-4 text-yellow-300" />
-                <span className="text-blue-100">{getGreeting()}</span>
+                <span className="text-blue-50">{getGreeting()}</span>
               </div>
-              <h1 className="text-3xl lg:text-4xl font-bold mb-3">
-                Xin chào, {user?.name?.split(' ').pop()}! 👋
+              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 tracking-tight animate-slide-in">
+                Xin chào, {user?.name?.split(' ').pop()}!
               </h1>
-              <p className="text-blue-100 text-base lg:text-lg max-w-xl leading-relaxed">
-                Chào mừng bạn đến với WebOOM DHV TEC. Hãy cùng khám phá và học hỏi những điều mới mẻ!
+              <p className="text-blue-100/90 text-lg lg:text-xl max-w-xl leading-relaxed mb-8 delay-100 animate-slide-in">
+                Chào mừng bạn đến với WebOOM DHV TEC. Cùng tạo nên những sản phẩm tuyệt vời hôm nay nhé!
               </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/sessions">
-                <Button className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm rounded-xl h-11 px-5">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Xem lịch học
-                </Button>
-              </Link>
-              {isTrainer && (
-                <Link href="/sessions/new">
-                  <Button className="bg-white text-blue-600 hover:bg-blue-50 border-0 rounded-xl h-11 px-5 font-semibold">
-                    <Zap className="mr-2 h-4 w-4" />
-                    Tạo buổi học
+
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4 delay-200 animate-slide-in">
+                <Link href="/sessions">
+                  <Button className="bg-white text-indigo-600 hover:bg-white/90 border-0 rounded-2xl h-12 px-8 font-bold shadow-xl shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95">
+                    <Calendar className="mr-2 h-5 w-5" />
+                    Xem lịch học
                   </Button>
                 </Link>
-              )}
+                {isTrainer && (
+                  <Link href="/sessions/new">
+                    <Button variant="ghost" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md rounded-2xl h-12 px-8 font-semibold transition-all hover:scale-105 active:scale-95">
+                      <Zap className="mr-2 h-5 w-5 text-yellow-300" />
+                      Tạo buổi học
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <div className="hidden lg:block relative w-full max-w-[320px] xl:max-w-[400px]">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-[100px] opacity-20 animate-pulse" />
+              <img
+                src="/images/welcome-bot.png"
+                alt="Welcome Assistant"
+                className="relative z-10 w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-float drop-shadow-blue-500/50"
+              />
             </div>
           </div>
         </div>
@@ -314,11 +324,10 @@ export default function DashboardPage() {
                     return (
                       <Link key={assignment.id} href={`/assignments/${assignment.id}`} className="block">
                         <div className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-emerald-200 dark:hover:border-emerald-800 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-900/10 dark:hover:to-teal-900/10 transition-all duration-200">
-                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform ${
-                            overdue
+                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform ${overdue
                               ? 'bg-gradient-to-br from-red-500 to-pink-500'
                               : 'bg-gradient-to-br from-emerald-500 to-teal-500'
-                          }`}>
+                            }`}>
                             {overdue ? (
                               <Clock className="h-5 w-5 text-white" />
                             ) : (
@@ -331,8 +340,8 @@ export default function DashboardPage() {
                               Deadline: {formatDateTime(new Date(assignment.dueAt))}
                             </p>
                           </div>
-                          <Badge className={overdue 
-                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0' 
+                          <Badge className={overdue
+                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0'
                             : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0'
                           }>
                             {overdue ? 'Quá hạn' : getRelativeTime(new Date(assignment.dueAt))}
