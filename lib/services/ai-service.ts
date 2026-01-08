@@ -141,11 +141,20 @@ export async function chatWithAI(
 ): Promise<AIAction> {
     const userMessage = messages[messages.length - 1].content.toLowerCase()
 
-    // Nếu có chứa từ khóa về code review, sử dụng Gemini
-    const isCodeReview = /review|code|bug|lỗi|tối ưu|dart|flutter/i.test(userMessage) && userMessage.length > 50
+    // Nếu có chứa từ khóa về code review hoặc có block code, sử dụng logic review chuyên sâu
+    const hasCodeBlock = userMessage.includes('```')
+    const isCodeReview = hasCodeBlock || (/review|code|bug|lỗi|tối ưu|dart|flutter|giải thích/i.test(userMessage) && userMessage.length > 10)
 
-    if (isCodeReview && process.env.GEMINI_API_KEY) {
+    const geminiApiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
+
+    // Nếu là code review và có key Gemini, ưu tiên dùng Gemini
+    if (isCodeReview && geminiApiKey) {
         return handleGeminiReview(messages)
+    }
+
+    // Nếu là code review nhưng KHÔNG có key Gemini, dùng Groq với prompt chuyên sâu
+    if (isCodeReview) {
+        return handleGroqCodeReview(messages)
     }
 
     const groq = getGroqClient()
@@ -287,6 +296,52 @@ Trả về kết quả dưới định dạng JSON:
             type: 'none',
             data: null,
             message: 'Gemini hiện đang bận hoặc có lỗi cấu hình API Key. Vui lòng thử lại sau.',
+            requiresConfirmation: false
+        }
+    }
+}
+
+// Xử lý Review Code bằng Groq (Phương án thay thế Gemini)
+async function handleGroqCodeReview(messages: ChatMessage[]): Promise<AIAction> {
+    try {
+        const groq = getGroqClient()
+        const lastMessage = messages[messages.length - 1].content
+
+        const prompt = `Bạn là một chuyên gia Flutter cao cấp. Hãy review đoạn code sau đây một cách cực kỳ chi tiết:
+1. Phát hiện bug hoặc lỗi logic.
+2. Gợi ý cách tối ưu performance (ví dụ: const constructors, repainboundary...).
+3. Kiểm tra tính tuân thủ Clean Architecture và SOLID.
+4. Trình bày bằng tiếng Việt, chuyên nghiệp, format markdown đẹp mắt.
+
+Đoạn code:
+${lastMessage}
+
+Bạn PHẢI trả về kết quả dưới định dạng JSON duy nhất:
+{
+  "action": "review_code",
+  "data": { "code": "phần code chính được trích xuất", "language": "dart" },
+  "message": "Nội dung review chi tiết của bạn ở đây. Dùng markdown mạnh mẽ để làm nổi bật các vấn đề.",
+  "requiresConfirmation": false
+}`
+
+        const completion = await groq.chat.completions.create({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+                { role: 'system', content: 'Bạn là chuyên gia Flutter Review Code. Chỉ trả về JSON.' },
+                { role: 'user', content: prompt }
+            ],
+            temperature: 0.3, // Thấp để chính xác hơn
+            response_format: { type: 'json_object' }
+        })
+
+        const responseContent = completion.choices[0]?.message?.content || ''
+        return parseAIResponse(responseContent)
+    } catch (error) {
+        console.error('Groq Review Error:', error)
+        return {
+            type: 'none',
+            data: null,
+            message: 'Hiện tại hệ thống Review đang bận. Vui lòng thử lại sau.',
             requiresConfirmation: false
         }
     }
