@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { Sparkles, MessageCircle, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export const FloatingRobot = () => {
     const [mounted, setMounted] = useState(false)
@@ -10,6 +11,7 @@ export const FloatingRobot = () => {
     const [isDragging, setIsDragging] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
     const controls = useAnimation()
+    const router = useRouter()
 
     useEffect(() => {
         setMounted(true)
@@ -79,7 +81,8 @@ export const FloatingRobot = () => {
                         setIsHovered(false)
                         setTimeout(startRandomMovement, 1000)
                     }}
-                    className="pointer-events-auto cursor-grab active:cursor-grabbing group relative w-full h-full"
+                    onClick={() => router.push('/ai-assistant')}
+                    className="pointer-events-auto cursor-pointer active:scale-95 group relative w-full h-full"
                 >
                     {/* Robot Body */}
                     <motion.div
@@ -118,9 +121,9 @@ export const FloatingRobot = () => {
                         <motion.div
                             initial={{ opacity: 0, scale: 0 }}
                             animate={(isHovered || isDragging) ? { opacity: 1, scale: 1, y: -50 } : { opacity: 0, scale: 0, y: 0 }}
-                            className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md text-gray-900 dark:text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-blue-500/30 whitespace-nowrap z-50 pointer-events-none transition-all"
+                            className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md text-gray-900 dark:text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-blue-500/30 whitespace-nowrap z-50 transition-all cursor-pointer group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300"
                         >
-                            Chào bạn! ✨
+                            Dạy mình code đi! ✨
                             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-inherit rotate-45 border-b border-r border-blue-500/30" />
                         </motion.div>
 

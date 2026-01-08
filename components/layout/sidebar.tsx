@@ -101,7 +101,7 @@ const menuItems: MenuItemType[] = [
     title: 'AI Assistant',
     href: '/ai-assistant',
     icon: Bot,
-    roles: ['admin', 'trainer'],
+    roles: ['admin', 'trainer', 'member'],
     gradient: 'from-violet-500 to-pink-500',
   },
 ]
