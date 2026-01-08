@@ -5,10 +5,24 @@ import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { Sparkles, MessageCircle, X } from 'lucide-react'
 
 export const FloatingRobot = () => {
+    const [mounted, setMounted] = useState(false)
     const [isVisible, setIsVisible] = useState(true)
-    const [position, setPosition] = useState({ x: 0, y: 0 })
     const [isWaving, setIsWaving] = useState(false)
     const controls = useAnimation()
+
+    useEffect(() => {
+        setMounted(true)
+        moveRandomly()
+
+        // Initial wave after 2 seconds
+        const waveTimer = setTimeout(() => setIsWaving(true), 2000)
+        const waveStopTimer = setTimeout(() => setIsWaving(false), 4000)
+
+        return () => {
+            clearTimeout(waveTimer)
+            clearTimeout(waveStopTimer)
+        }
+    }, [])
 
     // Generate a random position within screen bounds
     const getRandomPosition = () => {
@@ -37,20 +51,7 @@ export const FloatingRobot = () => {
         setTimeout(moveRandomly, Math.random() * 2000 + 1000)
     }
 
-    useEffect(() => {
-        moveRandomly()
-
-        // Initial wave after 2 seconds
-        const waveTimer = setTimeout(() => setIsWaving(true), 2000)
-        const waveStopTimer = setTimeout(() => setIsWaving(false), 4000)
-
-        return () => {
-            clearTimeout(waveTimer)
-            clearTimeout(waveStopTimer)
-        }
-    }, [])
-
-    if (!isVisible) return null
+    if (!mounted || !isVisible) return null
 
     return (
         <AnimatePresence>
@@ -62,7 +63,12 @@ export const FloatingRobot = () => {
                 className="fixed z-[9999] pointer-events-auto cursor-grab active:cursor-grabbing group"
                 style={{ width: 120, height: 120 }}
                 drag
-                dragConstraints={{ left: 0, right: window?.innerWidth - 120, top: 0, bottom: window?.innerHeight - 120 }}
+                dragConstraints={{
+                    left: 0,
+                    right: typeof window !== 'undefined' ? window.innerWidth - 120 : 0,
+                    top: 0,
+                    bottom: typeof window !== 'undefined' ? window.innerHeight - 120 : 0
+                }}
             >
                 {/* Robot Body */}
                 <motion.div
