@@ -22,14 +22,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Validate input
-        if (!messages || !Array.isArray(messages) || messages.length === 0) {
-            return NextResponse.json(
-                { error: 'Messages array is required' },
-                { status: 400 }
-            )
-        }
-
+        // Validate userId
         if (!userId) {
             return NextResponse.json(
                 { error: 'User ID is required' },
@@ -41,6 +34,14 @@ export async function POST(request: NextRequest) {
         if (executeAction) {
             const result = await executeAIAction(executeAction.type, executeAction.data, userId, userName)
             return NextResponse.json(result)
+        }
+
+        // Validate messages chỉ khi không phải executeAction
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+            return NextResponse.json(
+                { error: 'Messages array is required' },
+                { status: 400 }
+            )
         }
 
         // Gọi AI để xử lý message
