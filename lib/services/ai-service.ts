@@ -1,4 +1,5 @@
 import Groq from 'groq-sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 // Types
 export interface ChatMessage {
@@ -7,8 +8,8 @@ export interface ChatMessage {
 }
 
 export interface AIAction {
-    type: 'announcement' | 'session' | 'approve_request' | 'stats' | 'none'
-    data?: AnnouncementData | SessionData | ApproveRequestData | null
+    type: 'announcement' | 'session' | 'approve_request' | 'stats' | 'review_code' | 'none'
+    data?: AnnouncementData | SessionData | ApproveRequestData | CodeReviewData | null
     message: string
     requiresConfirmation: boolean
 }
@@ -30,6 +31,11 @@ export interface ApproveRequestData {
     requestId?: string
     action: 'approve' | 'reject'
     reason?: string
+}
+
+export interface CodeReviewData {
+    code: string
+    language: string
 }
 
 // System prompt cho AI
@@ -64,7 +70,15 @@ Khi admin muốn duyệt hoặc từ chối yêu cầu tham gia
 ### 4. Xem thống kê
 Khi admin hỏi về số liệu thống kê CLB
 
-### 5. Trò chuyện thông thường
+### 5. Review Code Flutter (review_code)
+Khi người dùng (thành viên) gửi một đoạn code và yêu cầu review hoặc tìm lỗi.
+Hãy trích xuất:
+- code: Đoạn code cần review
+- language: Ngôn ngữ (thường là "dart" hoặc "flutter")
+
+Ví dụ: "Hãy xem giúp mình đoạn code này có bug không: [code]" → Action review_code
+
+### 6. Trò chuyện thông thường
 Trả lời các câu hỏi về CLB, hỗ trợ kỹ thuật Flutter, v.v.
 
 ## Quy tắc:
@@ -124,7 +138,17 @@ export async function chatWithAI(
     messages: ChatMessage[],
     currentDate: Date = new Date()
 ): Promise<AIAction> {
+    const userMessage = messages[messages.length - 1].content.toLowerCase()
+
+    // Nếu có chứa từ khóa về code review, sử dụng Gemini
+    const isCodeReview = /review|code|bug|lỗi|tối ưu|dart|flutter/i.test(userMessage) && userMessage.length > 50
+
+    if (isCodeReview && process.env.GEMINI_API_KEY) {
+        return handleGeminiReview(messages)
+    }
+
     const groq = getGroqClient()
+    // ... existing Groq logic ...
 
     // Chuẩn bị system prompt với ngày hiện tại
     const systemPrompt = SYSTEM_PROMPT.replace(
@@ -202,8 +226,63 @@ ${data.content}`
 **Thời gian:** ${startDate.toLocaleString('vi-VN')} - ${endDate.toLocaleTimeString('vi-VN')}`
         }
 
+        case 'review_code': {
+            return `### 🔍 Kết quả Review Code\n\n${action.message}`
+        }
+
         default:
             return action.message
+    }
+}
+
+// Xử lý Review Code bằng Gemini
+async function handleGeminiReview(messages: ChatMessage[]): Promise<AIAction> {
+    try {
+        const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
+        if (!apiKey) {
+            return {
+                type: 'none',
+                data: null,
+                message: 'Chưa cấu hình GEMINI_API_KEY. Vui lòng thêm vào .env.local',
+                requiresConfirmation: false
+            }
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey)
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+
+        const lastMessage = messages[messages.length - 1].content
+
+        const prompt = `Bạn là một chuyên gia Flutter cao cấp. Hãy review đoạn code sau đây một cách chi tiết:
+1. Phát hiện bug hoặc lỗi logic.
+2. Gợi ý cách tối ưu performance.
+3. Kiểm tra tính tuân thủ Clean Architecture và SOLID.
+4. Trình bày bằng tiếng Việt, chuyên nghiệp, không dùng emoji.
+
+Đoạn code:
+${lastMessage}
+
+Trả về kết quả dưới định dạng JSON:
+{
+  "action": "review_code",
+  "data": { "code": "...", "language": "dart" },
+  "message": "Nội dung review chi tiết ở đây (dùng markdown)",
+  "requiresConfirmation": false
+}`
+
+        const result = await model.generateContent(prompt)
+        const response = await result.response
+        const text = response.text()
+
+        return parseAIResponse(text)
+    } catch (error) {
+        console.error('Gemini Error:', error)
+        return {
+            type: 'none',
+            data: null,
+            message: 'Gemini hiện đang bận hoặc có lỗi cấu hình API Key. Vui lòng thử lại sau.',
+            requiresConfirmation: false
+        }
     }
 }
 

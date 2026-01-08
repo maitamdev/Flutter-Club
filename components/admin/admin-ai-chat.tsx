@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils'
 import { AI_SUGGESTIONS } from '@/lib/services/ai-service'
 import { createAnnouncement, createSession } from '@/lib/firebase/firestore'
 import { notifyNewAnnouncement, notifyNewSession } from '@/lib/utils/notifications'
+import ReactMarkdown from 'react-markdown'
 
 // Types
 interface Message {
@@ -418,7 +419,13 @@ export function AdminAIChat() {
                                             ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-tr-sm'
                                             : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-tl-sm'
                                     )}>
-                                        <p className="whitespace-pre-wrap">{message.content}</p>
+                                        {message.role === 'assistant' ? (
+                                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                                                <ReactMarkdown>{message.content}</ReactMarkdown>
+                                            </div>
+                                        ) : (
+                                            <p className="whitespace-pre-wrap">{message.content}</p>
+                                        )}
                                     </div>
 
                                     {/* Action status badge */}
