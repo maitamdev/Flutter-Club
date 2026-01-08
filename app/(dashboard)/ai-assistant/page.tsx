@@ -17,12 +17,12 @@ export default function AIAssistantPage() {
     }, [])
 
     useEffect(() => {
-        if (!loading && !isTrainer) {
-            router.push('/dashboard')
+        if (!loading && !user) {
+            router.push('/(auth)/login')
         }
-    }, [loading, isTrainer, router])
+    }, [loading, user, router])
 
-    if (loading || !isTrainer) {
+    if (loading || !user) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
                 <div className="text-center space-y-4">
@@ -34,6 +34,8 @@ export default function AIAssistantPage() {
             </div>
         )
     }
+
+    const isAdminOrTrainer = user.role === 'admin' || user.role === 'trainer'
 
     return (
         <div className="space-y-6 pb-8">
@@ -79,43 +81,57 @@ export default function AIAssistantPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
+                            {isAdminOrTrainer && (
+                                <>
+                                    <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 dark:bg-gray-900/50">
+                                        <div className="h-8 w-8 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center shrink-0">
+                                            <Bell className="h-4 w-4 text-pink-500" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-sm">Đăng thông báo</h4>
+                                            <p className="text-xs text-muted-foreground">Tự động tạo nội dung thông báo chuyên nghiệp</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 dark:bg-gray-900/50">
+                                        <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                                            <Calendar className="h-4 w-4 text-blue-500" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-sm">Tạo lịch học</h4>
+                                            <p className="text-xs text-muted-foreground">Lên lịch buổi học với thời gian, địa điểm</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 dark:bg-gray-900/50">
+                                        <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                                            <Users className="h-4 w-4 text-green-500" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-sm">Quản lý thành viên</h4>
+                                            <p className="text-xs text-muted-foreground">Xem thống kê, duyệt yêu cầu tham gia</p>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 dark:bg-gray-900/50">
-                                <div className="h-8 w-8 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center shrink-0">
-                                    <Bell className="h-4 w-4 text-pink-500" />
+                                <div className="h-8 w-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                                    <Sparkles className="h-4 w-4 text-purple-500" />
                                 </div>
                                 <div>
-                                    <h4 className="font-medium text-sm">Đăng thông báo</h4>
-                                    <p className="text-xs text-muted-foreground">Tự động tạo nội dung thông báo chuyên nghiệp</p>
+                                    <h4 className="font-medium text-sm">Review Code Flutter</h4>
+                                    <p className="text-xs text-muted-foreground">Phân tích lỗi, bug và gợi ý tối ưu code Dart/Flutter</p>
                                 </div>
                             </div>
 
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 dark:bg-gray-900/50">
                                 <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                                    <Calendar className="h-4 w-4 text-blue-500" />
-                                </div>
-                                <div>
-                                    <h4 className="font-medium text-sm">Tạo lịch học</h4>
-                                    <p className="text-xs text-muted-foreground">Lên lịch buổi học với thời gian, địa điểm</p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 dark:bg-gray-900/50">
-                                <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                                    <Users className="h-4 w-4 text-green-500" />
-                                </div>
-                                <div>
-                                    <h4 className="font-medium text-sm">Quản lý thành viên</h4>
-                                    <p className="text-xs text-muted-foreground">Xem thống kê, duyệt yêu cầu tham gia</p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 dark:bg-gray-900/50">
-                                <div className="h-8 w-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-                                    <MessageSquare className="h-4 w-4 text-purple-500" />
+                                    <MessageSquare className="h-4 w-4 text-blue-500" />
                                 </div>
                                 <div>
                                     <h4 className="font-medium text-sm">Trả lời câu hỏi</h4>
-                                    <p className="text-xs text-muted-foreground">Hỗ trợ kỹ thuật Flutter, giải đáp thắc mắc</p>
+                                    <p className="text-xs text-muted-foreground">Giải đáp thắc mắc về kỹ thuật và hoạt động CLB</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -159,7 +175,8 @@ export default function AIAssistantPage() {
                                 <div>
                                     <p className="font-medium">Xin chào, {user?.name}!</p>
                                     <p className="text-sm text-white/80">
-                                        {user?.role === 'admin' ? 'Quản trị viên' : 'Trainer'}
+                                        {user?.role === 'admin' ? 'Quản trị viên' :
+                                            user?.role === 'trainer' ? 'Giảng viên' : 'Thành viên CLB'}
                                     </p>
                                 </div>
                             </div>
