@@ -124,62 +124,51 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Welcome Section */}
-      <div className={`relative overflow-hidden rounded-[2rem] transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-blue-600 to-violet-700" />
+      <div className={`relative overflow-hidden rounded-[2.5rem] min-h-[400px] flex items-center shadow-2xl transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        {/* Background Image with Overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-right lg:bg-center no-repeat transition-transform duration-10000 hover:scale-105"
+          style={{ backgroundImage: 'url("/images/dashboard-banner.png")' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-900/80 to-transparent z-10" />
 
-        {/* Animated background shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-400/5 rounded-full blur-3xl" />
+        {/* Decorative Light Leaks */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
+          <div className="absolute top-0 right-0 w-[500px] h-full bg-blue-500/10 blur-[120px] rounded-full translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-500/10 blur-[100px] rounded-full -translate-x-1/2" />
         </div>
 
-        {/* Pattern overlay */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }} />
-
-        <div className="relative z-10 p-8 lg:p-12 text-white">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 min-h-[320px]">
-            <div className="flex-1 text-center lg:text-left z-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-xl border border-white/20 text-sm font-medium mb-8 animate-fade-in">
-                <Sparkles className="h-4 w-4 text-yellow-300" />
-                <span className="text-blue-50 font-medium">{getGreeting()}</span>
-              </div>
-              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 tracking-tight animate-slide-in leading-[1.1]">
-                Xin chào, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-100">{user?.name?.split(' ').pop()}!</span>
-              </h1>
-              <p className="text-blue-100/90 text-lg lg:text-xl max-w-xl leading-relaxed mb-10 delay-100 animate-slide-in font-medium">
-                Chào mừng bạn đến với WebOOM DHV TEC. Cùng tạo nên những sản phẩm tuyệt vời hôm nay nhé!
-              </p>
-
-              <div className="flex flex-wrap justify-center lg:justify-start gap-5 delay-200 animate-slide-in">
-                <Link href="/sessions">
-                  <Button className="bg-white text-indigo-700 hover:bg-white/95 border-0 rounded-2xl h-14 px-10 text-lg font-bold shadow-2xl shadow-indigo-500/30 transition-all hover:scale-105 active:scale-95">
-                    <Calendar className="mr-3 h-6 w-6" />
-                    Xem lịch học
-                  </Button>
-                </Link>
-                {isTrainer && (
-                  <Link href="/sessions/new">
-                    <Button variant="ghost" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-xl rounded-2xl h-14 px-10 text-lg font-bold transition-all hover:scale-105 active:scale-95">
-                      <Zap className="mr-3 h-6 w-6 text-yellow-300 fill-yellow-300" />
-                      Tạo buổi học
-                    </Button>
-                  </Link>
-                )}
-              </div>
+        <div className="relative z-30 p-8 lg:p-16 w-full text-white">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-sm font-medium mb-8 animate-fade-in">
+              <Sparkles className="h-4 w-4 text-cyan-400" />
+              <span className="text-gray-300 uppercase tracking-widest text-xs">{getGreeting()}</span>
             </div>
 
-            <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-indigo-600/50 z-10" />
-              <img
-                src="/images/welcome-bot-wide.png"
-                alt="Welcome Assistant"
-                className="absolute right-[-10%] top-[-10%] bottom-[-10%] h-[120%] w-auto object-cover opacity-90 animate-float drop-shadow-2xl"
-              />
-              <div className="absolute inset-0 shadow-[inset_-100px_0_150px_-50px_rgba(30,58,138,0.5)]" />
+            <h1 className="text-5xl lg:text-7xl font-bold mb-6 tracking-tight animate-slide-in leading-[1.05]">
+              Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-300">{user?.name?.split(' ').pop()}!</span>
+            </h1>
+
+            <p className="text-gray-300 text-lg lg:text-xl max-w-xl leading-relaxed mb-10 delay-100 animate-slide-in font-medium opacity-90">
+              Welcome back to <span className="text-white font-bold">WebOOM DHV TEC</span>.
+              Ready to create something amazing today?
+            </p>
+
+            <div className="flex flex-wrap gap-5 delay-200 animate-slide-in">
+              <Link href="/sessions">
+                <Button className="bg-white text-gray-950 hover:bg-gray-100 border-0 rounded-2xl h-14 px-10 text-lg font-bold shadow-xl transition-all hover:scale-105 active:scale-95">
+                  <Calendar className="mr-3 h-6 w-6 text-indigo-600" />
+                  Lịch học
+                </Button>
+              </Link>
+              {isTrainer && (
+                <Link href="/sessions/new">
+                  <Button variant="outline" className="bg-transparent hover:bg-white/5 text-white border-white/20 backdrop-blur-md rounded-2xl h-14 px-10 text-lg font-bold transition-all hover:scale-105 active:scale-95">
+                    <Zap className="mr-3 h-6 w-6 text-yellow-400 fill-yellow-400" />
+                    Tạo mới
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
