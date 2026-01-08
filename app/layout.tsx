@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { IBM_Plex_Sans } from 'next/font/google'
+import { Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { AuthProvider } from '@/lib/hooks/useAuth'
 import { Toaster } from '@/components/ui/toaster'
 
-const ibmPlexSans = IBM_Plex_Sans({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin', 'vietnamese'],
   weight: ['300', '400', '500', '600', '700'],
 })
@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <body className={ibmPlexSans.className} suppressHydrationWarning>
+      <body className={spaceGrotesk.className} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

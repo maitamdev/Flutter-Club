@@ -18,7 +18,7 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['IBM Plex Sans', 'Inter', 'sans-serif'],
+        sans: ['Space Grotesk', 'IBM Plex Sans', 'Inter', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
