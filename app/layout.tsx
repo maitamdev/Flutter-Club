@@ -13,7 +13,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: 'WebOOM DHV TEC - Quản lý CLB Flutter',
-  description: 'Hệ thống quản lý Câu lạc bộ Flutter - Khoa Kỹ Thuật Công Nghệ - ĐH Văn Hiến',
+  description: 'Hệ thống quản lý Câu lạc bộ Flutter - Khoa Kỹ Thuật Công Nghệ - ĐH Hùng Vương TPHCM',
 }
 
 export default function RootLayout({
