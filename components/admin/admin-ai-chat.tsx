@@ -32,6 +32,8 @@ import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { AI_SUGGESTIONS } from '@/lib/services/ai-service'
+import { createAnnouncement, createSession } from '@/lib/firebase/firestore'
+import { notifyNewAnnouncement, notifyNewSession } from '@/lib/utils/notifications'
 
 // Types
 interface Message {
@@ -208,26 +210,56 @@ export function AdminAIChat() {
         setIsExecuting(true)
 
         try {
-            const response = await fetch('/api/ai-assistant', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    messages: [],
-                    userId: user.uid,
-                    userName: user.name,
-                    executeAction: {
-                        type: pendingAction.type,
-                        data: pendingAction.data
-                    }
-                })
-            })
+            let success = false
+            let successMessage = ''
 
-            const data = await response.json()
+            // Chạy trực tiếp ở Client để dùng Auth của user
+            switch (pendingAction.type) {
+                case 'announcement': {
+                    const data = pendingAction.data as { title: string; content: string }
+                    await createAnnouncement({
+                        title: data.title,
+                        content: data.content,
+                        createdBy: user.uid
+                    })
+                    await notifyNewAnnouncement(data.title, user.uid)
+                    success = true
+                    successMessage = `✅ Đã đăng thông báo "${data.title}" thành công!`
+                    break
+                }
+
+                case 'session': {
+                    const data = pendingAction.data as { title: string; description: string; location: string; startsAt: string; endsAt: string }
+                    const sessionDoc = await createSession({
+                        title: data.title,
+                        description: data.description || '',
+                        location: data.location || 'Phòng thực hành',
+                        startsAt: new Date(data.startsAt),
+                        endsAt: new Date(data.endsAt),
+                        trainerId: user.uid,
+                        trainerName: user.name || 'Admin',
+                        materials: []
+                    })
+                    await notifyNewSession(data.title, sessionDoc.id, user.uid)
+                    success = true
+                    successMessage = `✅ Đã tạo buổi học "${data.title}" thành công!`
+                    break
+                }
+
+                case 'stats': {
+                    success = true
+                    successMessage = '📊 Hãy truy cập Dashboard để xem thống kê chi tiết của CLB.'
+                    break
+                }
+
+                default:
+                    throw new Error('Hành động không được hỗ trợ')
+            }
 
             // Update message status
             setMessages(prev => prev.map(m =>
                 m.id === pendingAction.messageId
-                    ? { ...m, status: data.success ? 'executed' : 'rejected' as const }
+                    ? { ...m, status: success ? 'executed' : 'rejected' as const }
                     : m
             ))
 
@@ -235,27 +267,22 @@ export function AdminAIChat() {
             const resultMessage: Message = {
                 id: generateId(),
                 role: 'assistant',
-                content: data.message,
+                content: successMessage,
                 timestamp: new Date()
             }
             setMessages(prev => [...prev, resultMessage])
 
-            if (data.success) {
+            if (success) {
                 toast({
                     title: 'Thành công',
-                    description: data.message
-                })
-            } else {
-                toast({
-                    title: 'Thất bại',
-                    description: data.message,
-                    variant: 'destructive'
+                    description: successMessage
                 })
             }
-        } catch {
+        } catch (error: any) {
+            console.error('Execute Action Error:', error)
             toast({
                 title: 'Lỗi',
-                description: 'Không thể thực hiện hành động',
+                description: error.message || 'Không thể thực hiện hành động',
                 variant: 'destructive'
             })
         } finally {
