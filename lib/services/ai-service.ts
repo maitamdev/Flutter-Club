@@ -69,7 +69,7 @@ Trả lời các câu hỏi về CLB, hỗ trợ kỹ thuật Flutter, v.v.
 
 ## Quy tắc:
 - Luôn trả lời bằng tiếng Việt
-- Thân thiện, chuyên nghiệp
+- Thân thiện, chuyên nghiệp, KHÔNG sử dụng icon emoji trong câu trả lời
 - Khi tạo nội dung, hãy viết đầy đủ và chuyên nghiệp
 - Luôn xác nhận trước khi thực hiện hành động quan trọng
 - Nếu thiếu thông tin, hãy hỏi lại
@@ -161,7 +161,7 @@ export async function chatWithAI(
             return {
                 type: 'none',
                 data: null,
-                message: '⚠️ Lỗi cấu hình: API key không hợp lệ. Vui lòng kiểm tra GROQ_API_KEY trong .env.local',
+                message: 'Lỗi cấu hình: API key không hợp lệ. Vui lòng kiểm tra GROQ_API_KEY trong .env.local',
                 requiresConfirmation: false
             }
         }
@@ -169,7 +169,7 @@ export async function chatWithAI(
         return {
             type: 'none',
             data: null,
-            message: '❌ Đã xảy ra lỗi khi kết nối với AI. Vui lòng thử lại sau.',
+            message: 'Đã xảy ra lỗi khi kết nối với AI. Vui lòng thử lại sau.',
             requiresConfirmation: false
         }
     }
@@ -182,7 +182,7 @@ export function formatActionData(action: AIAction): string {
     switch (action.type) {
         case 'announcement': {
             const data = action.data as AnnouncementData
-            return `📢 **Thông báo sẽ được đăng:**
+            return `**Thông báo sẽ được đăng:**
       
 **Tiêu đề:** ${data.title}
 
@@ -194,7 +194,7 @@ ${data.content}`
             const data = action.data as SessionData
             const startDate = new Date(data.startsAt)
             const endDate = new Date(data.endsAt)
-            return `📅 **Buổi học sẽ được tạo:**
+            return `**Buổi học sẽ được tạo:**
       
 **Tên:** ${data.title}
 **Mô tả:** ${data.description}
@@ -209,9 +209,9 @@ ${data.content}`
 
 // Suggestions cho UI
 export const AI_SUGGESTIONS = [
-    { icon: '📢', text: 'Đăng thông báo về lịch nghỉ Tết' },
-    { icon: '📅', text: 'Tạo buổi học Flutter cơ bản' },
-    { icon: '📊', text: 'Xem thống kê CLB' },
-    { icon: '✅', text: 'Duyệt các yêu cầu tham gia' },
-    { icon: '💡', text: 'Gợi ý nội dung cho buổi học' },
+    { type: 'announcement', text: 'Đăng thông báo về lịch nghỉ Tết' },
+    { type: 'session', text: 'Tạo buổi học Flutter cơ bản' },
+    { type: 'stats', text: 'Xem thống kê CLB' },
+    { type: 'approve', text: 'Duyệt các yêu cầu tham gia' },
+    { type: 'help', text: 'Gợi ý nội dung cho buổi học' },
 ]

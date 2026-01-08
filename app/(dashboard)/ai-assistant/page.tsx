@@ -130,22 +130,22 @@ export default function AIAssistantPage() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2 text-sm">
-                            <p className="flex items-start gap-2">
-                                <span className="text-lg">💡</span>
+                            <div className="flex items-start gap-3 p-2">
+                                <Zap className="h-4 w-4 text-purple-500 mt-1 shrink-0" />
                                 <span>Nói rõ ràng và cụ thể để AI hiểu đúng ý bạn</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-lg">📅</span>
+                            </div>
+                            <div className="flex items-start gap-3 p-2">
+                                <Calendar className="h-4 w-4 text-blue-500 mt-1 shrink-0" />
                                 <span>Với lịch học, hãy nói rõ ngày giờ: &ldquo;thứ 7 lúc 14h&rdquo;</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-lg">✅</span>
+                            </div>
+                            <div className="flex items-start gap-3 p-2">
+                                <Shield className="h-4 w-4 text-green-500 mt-1 shrink-0" />
                                 <span>AI sẽ xác nhận trước khi thực hiện mọi hành động</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-lg">🔄</span>
+                            </div>
+                            <div className="flex items-start gap-3 p-2">
+                                <MessageSquare className="h-4 w-4 text-pink-500 mt-1 shrink-0" />
                                 <span>Có thể yêu cầu chỉnh sửa nếu chưa ưng ý</span>
-                            </p>
+                            </div>
                         </CardContent>
                     </Card>
 

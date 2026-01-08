@@ -14,7 +14,9 @@ import {
     BarChart3,
     RefreshCw,
     Zap,
-    MessageSquare
+    MessageSquare,
+    Shield,
+    Users
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -224,7 +226,7 @@ export function AdminAIChat() {
                     })
                     await notifyNewAnnouncement(data.title, user.uid)
                     success = true
-                    successMessage = `✅ Đã đăng thông báo "${data.title}" thành công!`
+                    successMessage = `Đã đăng thông báo "${data.title}" thành công!`
                     break
                 }
 
@@ -242,13 +244,13 @@ export function AdminAIChat() {
                     })
                     await notifyNewSession(data.title, sessionDoc.id, user.uid)
                     success = true
-                    successMessage = `✅ Đã tạo buổi học "${data.title}" thành công!`
+                    successMessage = `Đã tạo buổi học "${data.title}" thành công!`
                     break
                 }
 
                 case 'stats': {
                     success = true
-                    successMessage = '📊 Hãy truy cập Dashboard để xem thống kê chi tiết của CLB.'
+                    successMessage = 'Hãy truy cập Dashboard để xem thống kê chi tiết của CLB.'
                     break
                 }
 
@@ -304,7 +306,7 @@ export function AdminAIChat() {
         const rejectMessage: Message = {
             id: generateId(),
             role: 'assistant',
-            content: '❌ Đã hủy. Bạn có thể yêu cầu lại hoặc chỉnh sửa nội dung.',
+            content: 'Đã hủy. Bạn có thể yêu cầu lại hoặc chỉnh sửa nội dung.',
             timestamp: new Date()
         }
         setMessages(prev => [...prev, rejectMessage])
@@ -354,7 +356,7 @@ export function AdminAIChat() {
                                     <Sparkles className="h-10 w-10 text-white animate-pulse" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold mb-2">Xin chào! Tôi là AI Assistant 👋</h3>
+                                    <h3 className="text-xl font-bold mb-2">Xin chào! Tôi là AI Assistant</h3>
                                     <p className="text-muted-foreground max-w-md mx-auto">
                                         Tôi có thể giúp bạn đăng thông báo, tạo lịch học, và nhiều tác vụ khác.
                                         Hãy thử một trong các gợi ý bên dưới!
@@ -369,7 +371,11 @@ export function AdminAIChat() {
                                             onClick={() => handleSuggestion(suggestion.text)}
                                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-200 text-sm"
                                         >
-                                            <span>{suggestion.icon}</span>
+                                            {suggestion.type === 'announcement' && <Megaphone className="h-4 w-4 text-pink-500" />}
+                                            {suggestion.type === 'session' && <Calendar className="h-4 w-4 text-blue-500" />}
+                                            {suggestion.type === 'stats' && <BarChart3 className="h-4 w-4 text-green-500" />}
+                                            {suggestion.type === 'approve' && <Shield className="h-4 w-4 text-purple-500" />}
+                                            {suggestion.type === 'help' && <Sparkles className="h-4 w-4 text-yellow-500" />}
                                             <span>{suggestion.text}</span>
                                         </button>
                                     ))}
