@@ -1,5 +1,4 @@
 import Groq from 'groq-sdk'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
 // Types
 export interface ChatMessage {
@@ -145,14 +144,7 @@ export async function chatWithAI(
     const hasCodeBlock = userMessage.includes('```')
     const isCodeReview = hasCodeBlock || (/review|code|bug|lỗi|tối ưu|dart|flutter|giải thích/i.test(userMessage) && userMessage.length > 10)
 
-    const geminiApiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
-
-    // Nếu là code review và có key Gemini, ưu tiên dùng Gemini
-    if (isCodeReview && geminiApiKey) {
-        return handleGeminiReview(messages)
-    }
-
-    // Nếu là code review nhưng KHÔNG có key Gemini, dùng Groq với prompt chuyên sâu
+    // Nếu là code review, sử dụng logic review chuyên sâu bằng Groq
     if (isCodeReview) {
         return handleGroqCodeReview(messages)
     }
@@ -250,56 +242,7 @@ ${data.content}`
     }
 }
 
-// Xử lý Review Code bằng Gemini
-async function handleGeminiReview(messages: ChatMessage[]): Promise<AIAction> {
-    try {
-        const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
-        if (!apiKey) {
-            return {
-                type: 'none',
-                data: null,
-                message: 'Chưa cấu hình GEMINI_API_KEY. Vui lòng thêm vào .env.local',
-                requiresConfirmation: false
-            }
-        }
-
-        const genAI = new GoogleGenerativeAI(apiKey)
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-
-        const lastMessage = messages[messages.length - 1].content
-
-        const prompt = `Bạn là một chuyên gia Flutter cao cấp. Hãy review đoạn code sau đây một cách chi tiết:
-1. Phát hiện bug hoặc lỗi logic.
-2. Gợi ý cách tối ưu performance.
-3. Kiểm tra tính tuân thủ Clean Architecture và SOLID.
-4. Trình bày bằng tiếng Việt, chuyên nghiệp, không dùng emoji.
-
-Đoạn code:
-${lastMessage}
-
-Trả về kết quả dưới định dạng JSON:
-{
-  "action": "review_code",
-  "data": { "code": "...", "language": "dart" },
-  "message": "Nội dung review chi tiết ở đây (dùng markdown)",
-  "requiresConfirmation": false
-}`
-
-        const result = await model.generateContent(prompt)
-        const response = await result.response
-        const text = response.text()
-
-        return parseAIResponse(text)
-    } catch (error) {
-        console.error('Gemini Error:', error)
-        return {
-            type: 'none',
-            data: null,
-            message: 'Gemini hiện đang bận hoặc có lỗi cấu hình API Key. Vui lòng thử lại sau.',
-            requiresConfirmation: false
-        }
-    }
-}
+// Hết các function handling Gemini (Đã gỡ bỏ)
 
 // Xử lý Review Code bằng Groq (Phương án thay thế Gemini)
 async function handleGroqCodeReview(messages: ChatMessage[]): Promise<AIAction> {
