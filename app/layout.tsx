@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { AuthProvider } from '@/lib/hooks/useAuth'
 import { Toaster } from '@/components/ui/toaster'
+import { FloatingRobot } from '@/components/ui/floating-robot'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin', 'vietnamese'],
@@ -32,6 +33,7 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster />
+            <FloatingRobot />
           </AuthProvider>
         </ThemeProvider>
       </body>
