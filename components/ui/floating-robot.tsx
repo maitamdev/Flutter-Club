@@ -17,6 +17,8 @@ export const FloatingRobot = () => {
 
     useEffect(() => {
         if (mounted && isVisible) {
+            // First show the robot
+            controls.start({ opacity: 1, scale: 1, transition: { duration: 0.5 } })
             startRandomMovement()
         }
     }, [mounted, isVisible])
@@ -37,13 +39,13 @@ export const FloatingRobot = () => {
                 left: nextX,
                 top: nextY,
                 transition: {
-                    duration: Math.random() * 5 + 10,
+                    duration: Math.random() * 5 + 8,
                     ease: "easeInOut"
                 }
             })
 
             if (!isDragging && !isHovered && isVisible) {
-                setTimeout(move, Math.random() * 3000 + 1000)
+                setTimeout(move, Math.random() * 2000 + 1000)
             }
         }
 
@@ -56,7 +58,7 @@ export const FloatingRobot = () => {
         <AnimatePresence>
             <motion.div
                 animate={controls}
-                initial={{ opacity: 0, scale: 0, left: '80%', top: '80%' }}
+                initial={{ opacity: 0, scale: 0, left: '85%', top: '85%' }}
                 exit={{ opacity: 0, scale: 0 }}
                 className="fixed z-[9999] pointer-events-none"
                 style={{ width: 120, height: 120 }}
