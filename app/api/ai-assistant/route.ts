@@ -8,9 +8,10 @@ import {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { messages, userId } = body as {
+        const { messages, userId, userRole } = body as {
             messages: ChatMessage[]
             userId: string
+            userRole?: string
         }
 
         // Validate userId
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Gọi AI để xử lý message
-        const aiResponse = await chatWithAI(messages)
+        const aiResponse = await chatWithAI(messages, new Date(), userRole)
 
         return NextResponse.json({
             success: true,

@@ -161,7 +161,8 @@ export function AdminAIChat() {
                         content: m.content
                     })),
                     userId: user.uid,
-                    userName: user.name
+                    userName: user.name,
+                    userRole: user.role
                 })
             })
 
@@ -217,8 +218,13 @@ export function AdminAIChat() {
             let successMessage = ''
 
             // Chạy trực tiếp ở Client để dùng Auth của user
+            const isAdminOrTrainer = user.role === 'admin' || user.role === 'trainer'
+
             switch (pendingAction.type) {
                 case 'announcement': {
+                    if (!isAdminOrTrainer) {
+                        throw new Error('Bạn không có quyền đăng thông báo')
+                    }
                     const data = pendingAction.data as { title: string; content: string }
                     await createAnnouncement({
                         title: data.title,
@@ -232,6 +238,9 @@ export function AdminAIChat() {
                 }
 
                 case 'session': {
+                    if (!isAdminOrTrainer) {
+                        throw new Error('Bạn không có quyền tạo buổi học')
+                    }
                     const data = pendingAction.data as { title: string; description: string; location: string; startsAt: string; endsAt: string }
                     const sessionDoc = await createSession({
                         title: data.title,

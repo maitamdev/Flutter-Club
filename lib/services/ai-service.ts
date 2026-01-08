@@ -136,7 +136,8 @@ const parseAIResponse = (content: string): AIAction => {
 // Main function để chat với AI
 export async function chatWithAI(
     messages: ChatMessage[],
-    currentDate: Date = new Date()
+    currentDate: Date = new Date(),
+    userRole: string = 'member'
 ): Promise<AIAction> {
     const userMessage = messages[messages.length - 1].content.toLowerCase()
 
@@ -150,7 +151,12 @@ export async function chatWithAI(
     const groq = getGroqClient()
     // ... existing Groq logic ...
 
-    // Chuẩn bị system prompt với ngày hiện tại
+    // Chuẩn bị system prompt với ngày hiện tại và quyền hạn
+    let roleInstructions = ""
+    if (userRole === 'member') {
+        roleInstructions = "\n\nCRITICAL: User hiện tại là MEMBER. Bạn KHÔNG ĐƯỢC PHÉP tạo thông báo hoặc buổi học. Nếu user yêu cầu, hãy từ chối lịch sự và hướng dẫn họ liên hệ Admin. Bạn chỉ được hỗ trợ Review Code và các câu hỏi kỹ thuật."
+    }
+
     const systemPrompt = SYSTEM_PROMPT.replace(
         '{{CURRENT_DATE}}',
         currentDate.toLocaleDateString('vi-VN', {
@@ -159,7 +165,7 @@ export async function chatWithAI(
             month: 'long',
             day: 'numeric'
         })
-    )
+    ) + roleInstructions
 
     const fullMessages = [
         { role: 'system' as const, content: systemPrompt },
