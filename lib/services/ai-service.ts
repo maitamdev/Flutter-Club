@@ -144,36 +144,20 @@ export async function chatWithAI(
     const hasCodeBlock = userMessage.includes('```')
     const isCodeReview = hasCodeBlock || (/review|code|bug|lỗi|tối ưu|dart|flutter|giải thích/i.test(userMessage) && userMessage.length > 10)
 
-    // Nếu là code review, sử dụng logic review chuyên sâu bằng Groq
-    if (isCodeReview) {
-        return handleGroqCodeReview(messages)
-    }
-
-    const groq = getGroqClient()
-    // ... existing Groq logic ...
-
-    // Chuẩn bị system prompt với ngày hiện tại và quyền hạn
-    let roleInstructions = ""
-    if (userRole === 'member') {
-        roleInstructions = "\n\nCRITICAL: User hiện tại là MEMBER. Bạn KHÔNG ĐƯỢC PHÉP tạo thông báo hoặc buổi học. Nếu user yêu cầu, hãy từ chối lịch sự và hướng dẫn họ liên hệ Admin. Bạn chỉ được hỗ trợ Review Code và các câu hỏi kỹ thuật."
-    }
-
-    const systemPrompt = SYSTEM_PROMPT.replace(
-        '{{CURRENT_DATE}}',
-        currentDate.toLocaleDateString('vi-VN', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })
-    ) + roleInstructions
-
-    const fullMessages = [
-        { role: 'system' as const, content: systemPrompt },
-        ...messages.map(m => ({ role: m.role, content: m.content }))
-    ]
-
     try {
+        // 1. Thử dùng Groq làm engine chính (nhanh nhất)
+        const groq = getGroqClient()
+
+        if (isCodeReview) {
+            return await handleGroqCodeReview(messages)
+        }
+
+        const systemPrompt = prepareSystemPrompt(currentDate, userRole)
+        const fullMessages = [
+            { role: 'system' as const, content: systemPrompt },
+            ...messages.map(m => ({ role: m.role, content: m.content }))
+        ]
+
         const completion = await groq.chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: fullMessages,
@@ -184,26 +168,42 @@ export async function chatWithAI(
 
         const responseContent = completion.choices[0]?.message?.content || ''
         return parseAIResponse(responseContent)
-    } catch (error: any) {
-        console.error('Groq API Error:', error)
 
-        // Xử lý các lỗi cụ thể
-        if (error.message?.includes('API key')) {
-            return {
-                type: 'none',
-                data: null,
-                message: 'Lỗi cấu hình: API key không hợp lệ. Vui lòng kiểm tra GROQ_API_KEY trong .env.local',
-                requiresConfirmation: false
-            }
+    } catch (error: any) {
+        console.warn('Groq Error, switching to OpenRouter fallback:', error.message)
+
+        // 2. Nếu Groq lỗi/hết hạn mức -> Thử dùng OpenRouter
+        const openRouterKey = process.env.OPENROUTER_API_KEY || process.env.NEXT_PUBLIC_OPENROUTER_API_KEY
+        if (openRouterKey) {
+            return await handleOpenRouterChat(messages, currentDate, userRole, isCodeReview)
         }
 
+        // Nếu cả 2 đều thất bại
         return {
             type: 'none',
             data: null,
-            message: 'Đã xảy ra lỗi khi kết nối với AI. Vui lòng thử lại sau.',
+            message: 'Hệ thống AI hiện đang bận do quá tải. Vui lòng thử lại sau vài phút.',
             requiresConfirmation: false
         }
     }
+}
+
+// Helper để chuẩn bị system prompt
+function prepareSystemPrompt(currentDate: Date, userRole: string): string {
+    let roleInstructions = ""
+    if (userRole === 'member') {
+        roleInstructions = "\n\nCRITICAL: User hiện tại là MEMBER. Bạn KHÔNG ĐƯỢC PHÉP tạo thông báo hoặc buổi học. Nếu user yêu cầu, hãy từ chối lịch sự và hướng dẫn họ liên hệ Admin. Bạn chỉ được hỗ trợ Review Code và các câu hỏi kỹ thuật."
+    }
+
+    return SYSTEM_PROMPT.replace(
+        '{{CURRENT_DATE}}',
+        currentDate.toLocaleDateString('vi-VN', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        })
+    ) + roleInstructions
 }
 
 // Helper function để format datetime cho user
@@ -243,6 +243,69 @@ ${data.content}`
 }
 
 // Hết các function handling Gemini (Đã gỡ bỏ)
+
+// Xử lý bằng OpenRouter (Siêu dự phòng)
+async function handleOpenRouterChat(
+    messages: ChatMessage[],
+    currentDate: Date,
+    userRole: string,
+    isCodeReview: boolean
+): Promise<AIAction> {
+    try {
+        const apiKey = process.env.OPENROUTER_API_KEY || process.env.NEXT_PUBLIC_OPENROUTER_API_KEY
+        if (!apiKey) throw new Error('Missing OpenRouter API Key')
+
+        const lastMessage = messages[messages.length - 1].content
+        let systemPrompt = prepareSystemPrompt(currentDate, userRole)
+
+        if (isCodeReview) {
+            systemPrompt = `Bạn là một chuyên gia Flutter cao cấp. Hãy review đoạn code sau đây một cách chi tiết:
+1. Phát hiện bug hoặc lỗi logic.
+2. Gợi ý cách tối ưu performance.
+3. Kiểm tra Clean Architecture và SOLID.
+4. Trình bày bằng tiếng Việt, chuyên nghiệp, markdown đẹp.
+
+Bạn PHẢI trả về JSON:
+{
+  "action": "review_code",
+  "data": { "code": "...", "language": "dart" },
+  "message": "Nội dung review chi tiết",
+  "requiresConfirmation": false
+}`
+        }
+
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "HTTP-Referer": "https://flutter-club.vercel.app", // Optional
+                "X-Title": "Flutter Club Assistant",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "google/gemini-2.0-flash-exp:free", // Sử dụng model free cực mạnh và ổn định
+                "messages": [
+                    { "role": "system", "content": systemPrompt },
+                    ...messages.map(m => ({ "role": m.role, "content": m.content }))
+                ],
+                "response_format": { "type": "json_object" }
+            })
+        });
+
+        const data = await response.json();
+        const content = data.choices[0]?.message?.content || '';
+        return parseAIResponse(content);
+
+    } catch (error) {
+        console.error('OpenRouter Error:', error);
+        return {
+            type: 'none',
+            data: null,
+            message: 'Hệ thống AI dự phòng cũng đang bận. Vui lòng thử lại sau.',
+            requiresConfirmation: false
+        }
+    }
+}
 
 // Xử lý Review Code bằng Groq (Phương án thay thế Gemini)
 async function handleGroqCodeReview(messages: ChatMessage[]): Promise<AIAction> {
