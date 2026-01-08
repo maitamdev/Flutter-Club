@@ -6,20 +6,28 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function userData() {
+      return getUserDoc().data;
+    }
+
+    function userExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
     
     function isAdmin() {
-      return isAuthenticated() && getUserData().role == 'admin';
+      return isAuthenticated() && userExists() && userData().role == 'admin';
     }
     
     function isTrainer() {
-      return isAuthenticated() && (getUserData().role == 'trainer' || getUserData().role == 'admin');
+      return isAuthenticated() && userExists() && (userData().role == 'trainer' || userData().role == 'admin');
     }
     
     function isMember() {
-      return isAuthenticated() && getUserData().status == 'active';
+      return isAuthenticated() && userExists() && userData().status == 'active';
     }
     
     function isOwner(uid) {
@@ -28,53 +36,42 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      // Anyone authenticated can read user profiles
       allow read: if isAuthenticated();
-      // Only admin can create/update users, or user can read their own
       allow create: if isAdmin();
       allow update: if isAdmin() || isOwner(userId);
       allow delete: if isAdmin();
 
       // Notifications subcollection
       match /notifications/{notificationId} {
-        // Users can only read their own notifications
         allow read: if isOwner(userId);
-        // System (trainers/admin) can create notifications for any user
+        // Dùng isTrainer() để cho phép Admin/Trainer tạo thông báo cho bất kỳ ai
         allow create: if isTrainer();
-        // Users can update their own (mark as read)
         allow update: if isOwner(userId);
-        // Users can delete their own
         allow delete: if isOwner(userId);
       }
     }
 
     // Access Requests collection
     match /accessRequests/{requestId} {
-      // Admin can read all, users can read their own
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
-      // Authenticated users can create their own request
+      // Cho phép đọc nếu là admin HOẶC là chủ sở hữu request
+      allow read: if isAuthenticated() && (
+        (userExists() && userData().role == 'admin') 
+        || (resource != null && resource.data.uid == request.auth.uid)
+        || (request.query.limit != null && request.query.limit <= 10) // Fallback cho query list của chính mình
+      );
       allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
-      // Only admin can update (approve/reject)
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     // Sessions collection
     match /sessions/{sessionId} {
-      // All active members can read sessions
       allow read: if isMember();
-      // Only trainers can create/update/delete
-      allow create: if isTrainer();
-      allow update: if isTrainer();
-      allow delete: if isTrainer();
+      allow create, update, delete: if isTrainer();
 
       // Attendance subcollection
       match /attendance/{attendanceId} {
-        // Members can read all attendance, trainers can read all
         allow read: if isMember();
-        // Members can only create their own attendance
         allow create: if isMember() && attendanceId == request.auth.uid;
-        // No one can update or delete attendance (immutable)
         allow update: if false;
         allow delete: if isAdmin();
       }
@@ -82,28 +79,18 @@ service cloud.firestore {
 
     // Attendance Windows collection
     match /attendanceWindows/{sessionId} {
-      // All members can read (to check if check-in is open)
       allow read: if isMember();
-      // Only trainers can create/update
-      allow create: if isTrainer();
-      allow update: if isTrainer();
-      allow delete: if isTrainer();
+      allow create, update, delete: if isTrainer();
     }
 
     // Assignments collection
     match /assignments/{assignmentId} {
-      // All active members can read
       allow read: if isMember();
-      // Only trainers can create/update/delete
-      allow create: if isTrainer();
-      allow update: if isTrainer();
-      allow delete: if isTrainer();
+      allow create, update, delete: if isTrainer();
 
       // Submissions subcollection
       match /submissions/{submissionId} {
-        // Members can read their own, trainers can read all
         allow read: if isTrainer() || (isMember() && submissionId == request.auth.uid);
-        // Members can only create/update their own submission
         allow create: if isMember() && submissionId == request.auth.uid;
         allow update: if (isMember() && submissionId == request.auth.uid && !('score' in request.resource.data)) 
                       || isTrainer();
@@ -113,20 +100,12 @@ service cloud.firestore {
 
     // Quizzes collection
     match /quizzes/{quizId} {
-      // All active members can read
       allow read: if isMember();
-      // Only trainers can create/update/delete
-      allow create: if isTrainer();
-      allow update: if isTrainer();
-      allow delete: if isTrainer();
+      allow create, update, delete: if isTrainer();
 
-      // Quiz Attempts subcollection
       match /attempts/{attemptId} {
-        // Members can read their own, trainers can read all
         allow read: if isTrainer() || (isMember() && attemptId == request.auth.uid);
-        // Members can only create their own attempt (once)
         allow create: if isMember() && attemptId == request.auth.uid;
-        // No updates allowed (immutable)
         allow update: if false;
         allow delete: if isAdmin();
       }
@@ -134,12 +113,8 @@ service cloud.firestore {
 
     // Announcements collection
     match /announcements/{announcementId} {
-      // All active members can read
       allow read: if isMember();
-      // Only trainers can create/delete
-      allow create: if isTrainer();
-      allow update: if isTrainer();
-      allow delete: if isTrainer();
+      allow create, update, delete: if isTrainer();
     }
   }
 }

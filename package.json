@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed-admin": "tsx scripts/seed-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -32,7 +33,9 @@
     "cloudinary": "^2.8.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
+    "dotenv": "^17.2.3",
     "firebase": "^10.7.0",
+    "groq-sdk": "^0.37.0",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.323.0",
     "next": "14.2.15",

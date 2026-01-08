@@ -17,17 +17,18 @@ import {
   Menu,
   X,
   Sparkles,
+  Bot,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { Button } from '@/components/ui/button'
-import { 
-  subscribeToAccessRequests, 
-  getSessions, 
-  getAssignments, 
+import {
+  subscribeToAccessRequests,
+  getSessions,
+  getAssignments,
   getQuizzes,
   subscribeToAnnouncements,
-  getUsers 
+  getUsers
 } from '@/lib/firebase/firestore'
 import { isOverdue } from '@/lib/utils'
 
@@ -96,6 +97,13 @@ const menuItems: MenuItemType[] = [
     gradient: 'from-cyan-500 to-teal-500',
     countKey: 'requests',
   },
+  {
+    title: 'AI Assistant',
+    href: '/ai-assistant',
+    icon: Bot,
+    roles: ['admin', 'trainer'],
+    gradient: 'from-violet-500 to-pink-500',
+  },
 ]
 
 interface Counts {
@@ -153,11 +161,11 @@ export function Sidebar() {
         // Sessions - upcoming
         const sessions = await getSessions()
         const upcomingSessions = sessions.filter(s => new Date(s.startsAt) > new Date()).length
-        
+
         // Assignments - open (not overdue)
         const assignments = await getAssignments()
         const openAssignments = assignments.filter(a => !isOverdue(new Date(a.dueAt))).length
-        
+
         // Quizzes - active
         const quizzes = await getQuizzes()
         const now = new Date()
@@ -202,7 +210,7 @@ export function Sidebar() {
       const weekAgo = new Date()
       weekAgo.setDate(weekAgo.getDate() - 7)
       const readIds = getReadAnnouncementIds(user.uid)
-      const unreadCount = announcements.filter(a => 
+      const unreadCount = announcements.filter(a =>
         new Date(a.createdAt) > weekAgo && !readIds.includes(a.id)
       ).length
       setCounts(prev => ({ ...prev, announcements: unreadCount }))
@@ -215,13 +223,13 @@ export function Sidebar() {
         const weekAgo = new Date()
         weekAgo.setDate(weekAgo.getDate() - 7)
         const readIds = getReadAnnouncementIds(user.uid)
-        const unreadCount = announcements.filter(a => 
+        const unreadCount = announcements.filter(a =>
           new Date(a.createdAt) > weekAgo && !readIds.includes(a.id)
         ).length
         setCounts(prev => ({ ...prev, announcements: unreadCount }))
       }, 50)()
     }
-    
+
     window.addEventListener('announcementRead', handleAnnouncementRead)
 
     return () => {
@@ -318,12 +326,12 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-3 space-y-1">
         {filteredItems.map((item, index) => {
-          const isActive = pathname === item.href || 
+          const isActive = pathname === item.href ||
             (item.href !== '/dashboard' && pathname.startsWith(item.href))
           const count = getCount(item.countKey)
           const showBadge = count > 0
           const badgeColor = getBadgeColor(item.countKey)
-          
+
           return (
             <Link
               key={item.href}
@@ -339,8 +347,8 @@ export function Sidebar() {
             >
               <div className={cn(
                 'relative flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
-                isActive 
-                  ? `bg-gradient-to-br ${item.gradient} shadow-lg` 
+                isActive
+                  ? `bg-gradient-to-br ${item.gradient} shadow-lg`
                   : 'bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'
               )}>
                 <item.icon className={cn(
@@ -386,16 +394,16 @@ export function Sidebar() {
               <div className={cn(
                 'h-10 w-10 rounded-lg flex items-center justify-center text-white font-bold text-sm',
                 user.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                user.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
-                'bg-gradient-to-br from-emerald-500 to-teal-500'
+                  user.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                    'bg-gradient-to-br from-emerald-500 to-teal-500'
               )}>
                 {user.name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {user.role === 'admin' ? '👑 Quản trị viên' : 
-                   user.role === 'trainer' ? '🎓 Giảng viên' : '👤 Thành viên'}
+                  {user.role === 'admin' ? '👑 Quản trị viên' :
+                    user.role === 'trainer' ? '🎓 Giảng viên' : '👤 Thành viên'}
                 </p>
               </div>
             </div>
