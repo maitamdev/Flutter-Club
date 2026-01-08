@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { Sparkles, MessageCircle, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -10,6 +10,7 @@ export const FloatingRobot = () => {
     const [isVisible, setIsVisible] = useState(true)
     const [isDragging, setIsDragging] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
+    const hasDragged = useRef(false)
     const controls = useAnimation()
     const router = useRouter()
 
@@ -70,10 +71,14 @@ export const FloatingRobot = () => {
                     dragMomentum={false}
                     onDragStart={() => {
                         setIsDragging(true)
+                        hasDragged.current = true
                         controls.stop()
                     }}
                     onDragEnd={() => {
                         setIsDragging(false)
+                        setTimeout(() => {
+                            hasDragged.current = false
+                        }, 100)
                         setTimeout(startRandomMovement, 1000)
                     }}
                     onHoverStart={() => setIsHovered(true)}
@@ -81,7 +86,11 @@ export const FloatingRobot = () => {
                         setIsHovered(false)
                         setTimeout(startRandomMovement, 1000)
                     }}
-                    onClick={() => router.push('/ai-assistant')}
+                    onClick={() => {
+                        if (!hasDragged.current) {
+                            router.push('/ai-assistant')
+                        }
+                    }}
                     className="pointer-events-auto cursor-pointer active:scale-95 group relative w-full h-full"
                 >
                     {/* Robot Body */}
