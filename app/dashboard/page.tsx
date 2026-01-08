@@ -23,6 +23,7 @@ import { getSessions, getAssignments, getAnnouncements, getUsers } from '@/lib/f
 import { Session, Assignment, Announcement } from '@/types'
 import { formatDateTime, getRelativeTime, isOverdue } from '@/lib/utils'
 import { AttendanceChart } from '@/components/charts/attendance-chart'
+import { MemberProfileCard } from '@/components/ui/member-profile-card'
 
 export default function DashboardPage() {
   const { user, isAdmin, isTrainer } = useAuth()
@@ -150,7 +151,7 @@ export default function DashboardPage() {
             </h1>
 
             <p className="text-gray-300 text-lg lg:text-xl max-w-xl leading-relaxed mb-10 delay-100 animate-slide-in font-medium opacity-90">
-              Welcome back to <span className="text-white font-bold">WebOOM DHV TEC</span>.
+              Welcome back to <span className="text-white font-bold">FT CLUB HUB</span>.
               Ready to create something amazing today?
             </p>
 
@@ -174,35 +175,79 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {statCards.map((stat, index) => (
-          <Link key={stat.title} href={stat.href}>
-            <Card className={`group hover-card cursor-pointer overflow-hidden border-0 shadow-lg transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: `${(index + 1) * 100}ms` }}>
-              <CardContent className="p-6">
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-50`} />
-                <div className="relative flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground font-medium">{stat.title}</p>
-                    <p className="text-4xl font-bold mt-2 gradient-text">{stat.value}</p>
+      <div className="grid gap-6 lg:grid-cols-12">
+        {/* Left Column: Member Card & Stats */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* Member Profile Card */}
+          <div className={`${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'} transition-all duration-700 delay-300`}>
+            <div className="flex items-center gap-2 mb-4 px-2">
+              <Award className="h-5 w-5 text-yellow-500" />
+              <h2 className="text-xl font-bold tracking-tight">Thẻ Thành Viên</h2>
+            </div>
+            <MemberProfileCard
+              name={user?.name || "Thành viên"}
+              role={isAdmin ? "Administrator" : isTrainer ? "Trainer" : "Core Member"}
+              level={isAdmin ? 99 : 15}
+            />
+          </div>
+
+          {/* Quick Stats */}
+          <div className="space-y-4">
+            {statCards.map((stat, index) => (
+              <Link key={stat.title} href={stat.href}>
+                <Card className={`group hover-card cursor-pointer overflow-hidden border-0 shadow-lg transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: `${(index + 1) * 100 + 500}ms` }}>
+                  <CardContent className="p-5">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-50`} />
+                    <div className="relative flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{stat.title}</p>
+                        <p className="text-3xl font-black mt-1 gradient-text">{stat.value}</p>
+                      </div>
+                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                        <stat.icon className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          {/* Quick Actions */}
+          {isTrainer && (
+            <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '800ms' }}>
+              <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                    <Zap className="h-4 w-4 text-white" />
                   </div>
-                  <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className="h-7 w-7 text-white" />
-                  </div>
+                  <CardTitle className="text-lg">Thao tác nhanh</CardTitle>
                 </div>
-                <div className="relative mt-4 flex items-center text-sm text-muted-foreground">
-                  <ArrowRight className="h-4 w-4 mr-1 group-hover:translate-x-1 transition-transform" />
-                  Xem chi tiết
-                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-2">
+                <Link href="/sessions/new" className="block">
+                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-violet-50 hover:border-violet-200 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center mr-3">
+                      <Calendar className="h-4 w-4 text-white" />
+                    </div>
+                    Buổi học mới
+                  </Button>
+                </Link>
+                <Link href="/announcements" className="block">
+                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-pink-50 hover:border-pink-200 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mr-3">
+                      <Bell className="h-4 w-4 text-white" />
+                    </div>
+                    Đăng thông báo
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
-          </Link>
-        ))}
-      </div>
+          )}
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Right Column: Main Content */}
+        <div className="lg:col-span-8 space-y-6">
           {/* Attendance Chart */}
           {isTrainer && (
             <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '400ms' }}>
@@ -237,39 +282,29 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <Link href="/sessions">
-                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                    Xem tất cả
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button variant="ghost" size="sm" className="text-blue-600">
+                    Tất cả <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
               </div>
             </CardHeader>
             <CardContent className="p-4">
               {sessions.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="h-8 w-8 text-gray-400" />
-                  </div>
-                  <p className="text-muted-foreground">Chưa có buổi học nào được lên lịch</p>
-                </div>
+                <div className="text-center py-12 opacity-50">Chưa có buổi học nào</div>
               ) : (
                 <div className="space-y-3">
-                  {sessions.map((session, index) => (
+                  {sessions.map((session) => (
                     <Link key={session.id} href={`/sessions/${session.id}`} className="block">
-                      <div className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-cyan-50/50 dark:hover:from-blue-900/10 dark:hover:to-cyan-900/10 transition-all duration-200">
-                        <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                      <div className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-200 transition-all">
+                        <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex flex-col items-center justify-center text-white shadow-lg">
                           <span className="text-lg font-bold leading-none">{new Date(session.startsAt).getDate()}</span>
                           <span className="text-[10px] uppercase opacity-80">Th{new Date(session.startsAt).getMonth() + 1}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{session.title}</p>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {formatDateTime(new Date(session.startsAt))}
-                          </p>
+                          <p className="font-semibold truncate">{session.title}</p>
+                          <p className="text-sm text-muted-foreground">{getRelativeTime(new Date(session.startsAt))}</p>
                         </div>
-                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-0">
-                          {getRelativeTime(new Date(session.startsAt))}
-                        </Badge>
+                        <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-blue-500 transition-all" />
                       </div>
                     </Link>
                   ))}
@@ -291,153 +326,31 @@ export default function DashboardPage() {
                     <CardDescription>Các bài tập cần hoàn thành</CardDescription>
                   </div>
                 </div>
-                <Link href="/assignments">
-                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                    Xem tất cả
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
               </div>
             </CardHeader>
             <CardContent className="p-4">
               {assignments.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
-                    <FileText className="h-8 w-8 text-gray-400" />
-                  </div>
-                  <p className="text-muted-foreground">Chưa có bài tập nào</p>
-                </div>
+                <div className="text-center py-12 opacity-50">Chưa có bài tập nào</div>
               ) : (
                 <div className="space-y-3">
-                  {assignments.map((assignment) => {
-                    const overdue = isOverdue(new Date(assignment.dueAt))
-                    return (
-                      <Link key={assignment.id} href={`/assignments/${assignment.id}`} className="block">
-                        <div className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-emerald-200 dark:hover:border-emerald-800 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-900/10 dark:hover:to-teal-900/10 transition-all duration-200">
-                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform ${overdue
-                            ? 'bg-gradient-to-br from-red-500 to-pink-500'
-                            : 'bg-gradient-to-br from-emerald-500 to-teal-500'
-                            }`}>
-                            {overdue ? (
-                              <Clock className="h-5 w-5 text-white" />
-                            ) : (
-                              <FileText className="h-5 w-5 text-white" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{assignment.title}</p>
-                            <p className="text-sm text-muted-foreground mt-0.5">
-                              Deadline: {formatDateTime(new Date(assignment.dueAt))}
-                            </p>
-                          </div>
-                          <Badge className={overdue
-                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0'
-                            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0'
-                          }>
-                            {overdue ? 'Quá hạn' : getRelativeTime(new Date(assignment.dueAt))}
-                          </Badge>
+                  {assignments.map((assignment) => (
+                    <Link key={assignment.id} href={`/assignments/${assignment.id}`} className="block">
+                      <div className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-emerald-200 transition-all">
+                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-lg">
+                          <FileText className="h-5 w-5" />
                         </div>
-                      </Link>
-                    )
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Announcements */}
-          <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '700ms' }}>
-            <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg">
-                  <Bell className="h-5 w-5 text-white" />
-                </div>
-                <CardTitle>Thông báo mới</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4">
-              {announcements.length === 0 ? (
-                <div className="text-center py-8">
-                  <Bell className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Chưa có thông báo nào</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {announcements.map((announcement, index) => (
-                    <div
-                      key={announcement.id}
-                      className="relative pl-4 py-2 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:rounded-full before:bg-gradient-to-b before:from-pink-500 before:to-rose-500"
-                    >
-                      <p className="font-medium text-sm">{announcement.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {announcement.content}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {getRelativeTime(new Date(announcement.createdAt))}
-                      </p>
-                    </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold truncate">{assignment.title}</p>
+                          <p className="text-sm text-muted-foreground">Deadline: {getRelativeTime(new Date(assignment.dueAt))}</p>
+                        </div>
+                        <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-50/50">Mới</Badge>
+                      </div>
+                    </Link>
                   ))}
                 </div>
               )}
-              <Link href="/announcements" className="block mt-4">
-                <Button variant="outline" className="w-full rounded-xl" size="sm">
-                  Xem tất cả thông báo
-                </Button>
-              </Link>
             </CardContent>
           </Card>
-
-          {/* Quick Actions */}
-          {isTrainer && (
-            <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '800ms' }}>
-              <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                    <Zap className="h-5 w-5 text-white" />
-                  </div>
-                  <CardTitle>Thao tác nhanh</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 space-y-2">
-                <Link href="/sessions/new" className="block">
-                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 dark:hover:bg-violet-900/20 dark:hover:border-violet-800 dark:hover:text-violet-400 transition-colors">
-                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center mr-3">
-                      <Calendar className="h-4 w-4 text-white" />
-                    </div>
-                    Tạo buổi học mới
-                  </Button>
-                </Link>
-                <Link href="/assignments/new" className="block">
-                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 dark:hover:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:text-emerald-400 transition-colors">
-                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mr-3">
-                      <FileText className="h-4 w-4 text-white" />
-                    </div>
-                    Tạo bài tập mới
-                  </Button>
-                </Link>
-                <Link href="/quizzes/new" className="block">
-                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 dark:hover:bg-orange-900/20 dark:hover:border-orange-800 dark:hover:text-orange-400 transition-colors">
-                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center mr-3">
-                      <Target className="h-4 w-4 text-white" />
-                    </div>
-                    Tạo quiz mới
-                  </Button>
-                </Link>
-                <Link href="/announcements" className="block">
-                  <Button variant="outline" className="w-full justify-start rounded-xl h-12 hover:bg-pink-50 hover:border-pink-200 hover:text-pink-700 dark:hover:bg-pink-900/20 dark:hover:border-pink-800 dark:hover:text-pink-400 transition-colors">
-                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mr-3">
-                      <Bell className="h-4 w-4 text-white" />
-                    </div>
-                    Đăng thông báo
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
     </div>
