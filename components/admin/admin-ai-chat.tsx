@@ -368,19 +368,23 @@ export function AdminAIChat() {
                                 <div>
                                     <h3 className="text-xl font-bold mb-2">Xin chào! Tôi là AI Assistant</h3>
                                     <p className="text-muted-foreground max-w-md mx-auto">
-                                        Tôi có thể giúp bạn đăng thông báo, tạo lịch học, và nhiều tác vụ khác.
+                                        {user?.role === 'member'
+                                            ? 'Tôi có thể giúp bạn review code Flutter, tìm lỗi và giải đáp thắc mắc kỹ thuật.'
+                                            : 'Tôi có thể giúp bạn đăng thông báo, tạo lịch học, và nhiều tác vụ khác.'}
+                                        <br />
                                         Hãy thử một trong các gợi ý bên dưới!
                                     </p>
                                 </div>
 
                                 {/* Suggestions */}
                                 <div className="flex flex-wrap justify-center gap-2 max-w-lg mx-auto">
-                                    {AI_SUGGESTIONS.map((suggestion, index) => (
+                                    {AI_SUGGESTIONS.filter(s => s.roles.includes(user?.role || 'member')).map((suggestion, index) => (
                                         <button
                                             key={index}
                                             onClick={() => handleSuggestion(suggestion.text)}
                                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-200 text-sm"
                                         >
+                                            {suggestion.type === 'review' && <Sparkles className="h-4 w-4 text-purple-500" />}
                                             {suggestion.type === 'announcement' && <Megaphone className="h-4 w-4 text-pink-500" />}
                                             {suggestion.type === 'session' && <Calendar className="h-4 w-4 text-blue-500" />}
                                             {suggestion.type === 'stats' && <BarChart3 className="h-4 w-4 text-green-500" />}
@@ -507,7 +511,10 @@ export function AdminAIChat() {
                                 ref={inputRef}
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder="Nhập tin nhắn... (VD: đăng thông báo nghỉ Tết)"
+                                placeholder={user?.role === 'member'
+                                    ? "Hỏi về Flutter hoặc dán code cần review..."
+                                    : "Nhập tin nhắn... (VD: đăng thông báo nghỉ Tết)"
+                                }
                                 className="pl-10 h-12 rounded-xl border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500"
                                 disabled={isLoading}
                             />
@@ -529,33 +536,56 @@ export function AdminAIChat() {
                     </form>
 
                     {/* Quick actions */}
-                    <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-muted-foreground">
                         <Zap className="h-4 w-4" />
                         <span>Gợi ý:</span>
-                        <button
-                            type="button"
-                            onClick={() => handleSuggestion('Xem thống kê CLB')}
-                            className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
-                        >
-                            <BarChart3 className="h-3 w-3 inline mr-1" />
-                            Thống kê
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handleSuggestion('Đăng thông báo mới')}
-                            className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
-                        >
-                            <Megaphone className="h-3 w-3 inline mr-1" />
-                            Thông báo
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handleSuggestion('Tạo lịch học tuần này')}
-                            className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
-                        >
-                            <Calendar className="h-3 w-3 inline mr-1" />
-                            Lịch học
-                        </button>
+                        {user?.role === 'member' ? (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSuggestion('Review code Flutter này giúp mình')}
+                                    className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
+                                >
+                                    <Sparkles className="h-3 w-3 inline mr-1" />
+                                    Review Code
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSuggestion('Lộ trình học Flutter nâng cao')}
+                                    className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
+                                >
+                                    <Sparkles className="h-3 w-3 inline mr-1" />
+                                    Lộ trình học
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSuggestion('Xem thống kê CLB')}
+                                    className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
+                                >
+                                    <BarChart3 className="h-3 w-3 inline mr-1" />
+                                    Thống kê
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSuggestion('Đăng thông báo mới')}
+                                    className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
+                                >
+                                    <Megaphone className="h-3 w-3 inline mr-1" />
+                                    Thông báo
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSuggestion('Tạo lịch học tuần này')}
+                                    className="px-2 py-1 rounded bg-muted hover:bg-muted/80"
+                                >
+                                    <Calendar className="h-3 w-3 inline mr-1" />
+                                    Lịch học
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </Card>

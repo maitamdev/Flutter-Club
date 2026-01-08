@@ -294,9 +294,10 @@ Trả về kết quả dưới định dạng JSON:
 
 // Suggestions cho UI
 export const AI_SUGGESTIONS = [
-    { type: 'announcement', text: 'Đăng thông báo về lịch nghỉ Tết' },
-    { type: 'session', text: 'Tạo buổi học Flutter cơ bản' },
-    { type: 'stats', text: 'Xem thống kê CLB' },
-    { type: 'approve', text: 'Duyệt các yêu cầu tham gia' },
-    { type: 'help', text: 'Gợi ý nội dung cho buổi học' },
+    { type: 'review', text: 'Review giúp mình đoạn code này', roles: ['admin', 'trainer', 'member'] },
+    { type: 'help', text: 'Lộ trình học Flutter cho người mới', roles: ['admin', 'trainer', 'member'] },
+    { type: 'announcement', text: 'Đăng thông báo về lịch nghỉ Tết', roles: ['admin', 'trainer'] },
+    { type: 'session', text: 'Tạo buổi học Flutter cơ bản', roles: ['admin', 'trainer'] },
+    { type: 'stats', text: 'Xem thống kê CLB', roles: ['admin', 'trainer'] },
+    { type: 'approve', text: 'Duyệt các yêu cầu tham gia', roles: ['admin', 'trainer'] },
 ]
