@@ -95,11 +95,12 @@ export const FloatingRobot = () => {
                         }}
                         className="relative w-full h-full"
                     >
-                        {/* Subtle Glow Background */}
-                        <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full scale-75 animate-pulse" />
+                        {/* Premium Glow Background */}
+                        <div className="absolute inset-0 bg-blue-400/30 blur-[40px] rounded-full scale-90 animate-pulse" />
+                        <div className="absolute inset-0 bg-indigo-500/20 blur-[60px] rounded-full scale-110" />
 
-                        {/* The Mascot Image */}
-                        <div className="relative w-full h-full rounded-full overflow-hidden border border-white/10 shadow-lg bg-black/40 backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300">
+                        {/* The Mascot Image - Glass Container */}
+                        <div className="relative w-full h-full rounded-full overflow-hidden border border-white/20 shadow-[0_0_30px_rgba(59,130,246,0.3)] bg-gradient-to-b from-white/10 to-blue-500/5 backdrop-blur-md group-hover:border-blue-400/50 transition-all duration-500">
                             <motion.img
                                 src="/images/robot-mascot.png"
                                 alt="AI Mascot"
@@ -107,7 +108,7 @@ export const FloatingRobot = () => {
                                     rotate: [0, 15, -15, 15, 0],
                                 } : {}}
                                 transition={{ duration: 1, repeat: isHovered ? Infinity : 0 }}
-                                className="w-full h-full object-cover scale-110 select-none pointer-events-none"
+                                className="w-full h-full object-cover scale-110 select-none pointer-events-none drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
                                 style={{ mixBlendMode: 'lighten' }}
                                 draggable={false}
                             />
@@ -117,7 +118,7 @@ export const FloatingRobot = () => {
                         <motion.div
                             initial={{ opacity: 0, scale: 0 }}
                             animate={(isHovered || isDragging) ? { opacity: 1, scale: 1, y: -50 } : { opacity: 0, scale: 0, y: 0 }}
-                            className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-2xl border border-blue-500/30 whitespace-nowrap z-50 pointer-events-none transition-all"
+                            className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md text-gray-900 dark:text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-blue-500/30 whitespace-nowrap z-50 pointer-events-none transition-all"
                         >
                             Chào bạn! ✨
                             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-inherit rotate-45 border-b border-r border-blue-500/30" />
@@ -129,14 +130,15 @@ export const FloatingRobot = () => {
                                 e.stopPropagation()
                                 setIsVisible(false)
                             }}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg hover:bg-red-600 z-[100]"
+                            className="absolute -top-2 -right-2 bg-red-500/80 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm z-[100]"
                         >
                             <X size={12} />
                         </button>
                     </motion.div>
 
-                    {/* Trail Effect */}
-                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-1 bg-blue-500/30 blur-md rounded-full scale-x-150 animate-pulse" />
+                    {/* Trail Effect - Tech Style */}
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-12 h-2 bg-blue-400/20 blur-xl rounded-full scale-x-150 animate-pulse" />
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-8 h-1 bg-blue-400/40 blur-md rounded-full scale-x-125" />
                 </motion.div>
             </motion.div>
         </AnimatePresence>
