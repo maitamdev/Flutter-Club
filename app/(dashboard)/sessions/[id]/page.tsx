@@ -319,18 +319,25 @@ export default function SessionDetailPage() {
                 </Button>
               </>
             ) : (
-              <Button
-                onClick={handleStartCheckin}
-                disabled={startingCheckin}
-                className="bg-gradient-to-r from-green-500 to-emerald-500"
-              >
-                {startingCheckin ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Play className="mr-2 h-4 w-4" />
-                )}
-                Bắt đầu điểm danh
-              </Button>
+              <>
+                <Link href={`/sessions/${sessionId}/edit`}>
+                  <Button variant="outline">
+                    Chỉnh sửa
+                  </Button>
+                </Link>
+                <Button
+                  onClick={handleStartCheckin}
+                  disabled={startingCheckin}
+                  className="bg-gradient-to-r from-green-500 to-emerald-500"
+                >
+                  {startingCheckin ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Play className="mr-2 h-4 w-4" />
+                  )}
+                  Bắt đầu điểm danh
+                </Button>
+              </>
             )}
           </div>
         )}
