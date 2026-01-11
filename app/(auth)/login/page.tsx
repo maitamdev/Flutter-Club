@@ -103,8 +103,8 @@ export default function LoginPage() {
 
         {/* Background Image */}
         <img
-          src="/hvuh.jpg"
-          alt="HVUH Campus"
+          src="/dhv.jpg"
+          alt="DHV Campus"
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
 

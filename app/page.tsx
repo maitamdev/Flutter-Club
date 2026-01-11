@@ -63,7 +63,7 @@ export default function HomePage() {
           <div className={`transition-all duration-1000 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <h1 className="text-5xl xl:text-6xl font-black mb-4 leading-tight">
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                WebOOM HVUH TEC
+                WebOOM DHV TEC
               </span>
             </h1>
             <p className="text-xl xl:text-2xl text-gray-300 mb-2">
@@ -129,7 +129,7 @@ export default function HomePage() {
               <GraduationCap className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              WebOOM HVUH TEC
+              WebOOM DHV TEC
             </h1>
             <p className="text-gray-500 text-sm mt-1">ĐH Hùng Vương TPHCM</p>
           </div>
@@ -217,7 +217,7 @@ export default function HomePage() {
 
           {/* Footer */}
           <p className="text-center text-gray-600 text-sm mt-8">
-            © 2024 WebOOM HVUH TEC • ĐH Hùng Vương TPHCM
+            © 2024 WebOOM DHV TEC • ĐH Hùng Vương TPHCM
           </p>
         </div>
       </div>
