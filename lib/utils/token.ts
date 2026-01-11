@@ -57,17 +57,26 @@ export async function validateToken(
   tokenSeed: string,
   rotationSeconds: number = 10
 ): Promise<boolean> {
-  // Check current time slot
-  const currentToken = await generateToken(tokenSeed, rotationSeconds)
-  if (token === currentToken) return true
+  try {
+    if (!token || !tokenSeed) {
+      return false
+    }
 
-  // Check previous time slot (grace period)
-  const prevTimeSlot = Math.floor(Date.now() / (rotationSeconds * 1000)) - 1
-  const prevMessage = `${TOKEN_SECRET}:${tokenSeed}:${prevTimeSlot}`
-  const prevHash = await simpleHash(prevMessage)
-  const prevToken = prevHash.substring(0, 16)
+    // Check current time slot
+    const currentToken = await generateToken(tokenSeed, rotationSeconds)
+    if (token === currentToken) return true
 
-  return token === prevToken
+    // Check previous time slot (grace period)
+    const prevTimeSlot = Math.floor(Date.now() / (rotationSeconds * 1000)) - 1
+    const prevMessage = `${TOKEN_SECRET}:${tokenSeed}:${prevTimeSlot}`
+    const prevHash = await simpleHash(prevMessage)
+    const prevToken = prevHash.substring(0, 16)
+
+    return token === prevToken
+  } catch (error) {
+    console.error('Token validation error:', error)
+    return false
+  }
 }
 
 // Validate mã dự phòng động
@@ -76,17 +85,26 @@ export async function validateFallbackCode(
   tokenSeed: string,
   rotationSeconds: number = 10
 ): Promise<boolean> {
-  // Check current time slot
-  const currentCode = await generateFallbackCode(tokenSeed, rotationSeconds)
-  if (code.toUpperCase() === currentCode) return true
+  try {
+    if (!code || !tokenSeed) {
+      return false
+    }
 
-  // Check previous time slot (grace period)
-  const prevTimeSlot = Math.floor(Date.now() / (rotationSeconds * 1000)) - 1
-  const prevMessage = `FALLBACK:${tokenSeed}:${prevTimeSlot}`
-  const prevHash = await simpleHash(prevMessage)
-  const prevCode = prevHash.substring(0, 6).toUpperCase()
+    // Check current time slot
+    const currentCode = await generateFallbackCode(tokenSeed, rotationSeconds)
+    if (code.toUpperCase() === currentCode) return true
 
-  return code.toUpperCase() === prevCode
+    // Check previous time slot (grace period)
+    const prevTimeSlot = Math.floor(Date.now() / (rotationSeconds * 1000)) - 1
+    const prevMessage = `FALLBACK:${tokenSeed}:${prevTimeSlot}`
+    const prevHash = await simpleHash(prevMessage)
+    const prevCode = prevHash.substring(0, 6).toUpperCase()
+
+    return code.toUpperCase() === prevCode
+  } catch (error) {
+    console.error('Fallback code validation error:', error)
+    return false
+  }
 }
 
 export function generateQRData(
@@ -106,8 +124,16 @@ export function parseQRData(
   data: string
 ): { sessionId: string; token: string; fallbackCode: string; timestamp: number } | null {
   try {
-    return JSON.parse(data)
-  } catch {
+    const parsed = JSON.parse(data)
+    
+    // Validate required fields
+    if (!parsed.sessionId || !parsed.token) {
+      return null
+    }
+    
+    return parsed
+  } catch (error) {
+    console.error('Failed to parse QR data:', error)
     return null
   }
 }

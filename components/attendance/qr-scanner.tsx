@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
 import { Camera, X, Keyboard, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -34,66 +34,8 @@ export function QRScanner({
   const scannerRef = useRef<Html5Qrcode | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (mode !== 'camera' || !containerRef.current) return
-
-    const scanner = new Html5Qrcode('qr-reader')
-    scannerRef.current = scanner
-
-    scanner
-      .start(
-        { facingMode: 'environment' },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-        },
-        handleScan,
-        () => {} // Ignore errors during scanning
-      )
-      .catch((err) => {
-        console.error('Camera error:', err)
-        setCameraError(true)
-        setMode('manual')
-      })
-
-    return () => {
-      if (scannerRef.current?.isScanning) {
-        scannerRef.current.stop().catch(console.error)
-      }
-    }
-  }, [mode])
-
-  const handleScan = async (decodedText: string) => {
-    if (loading) return
-
-    try {
-      const qrData = parseQRData(decodedText)
-      if (!qrData || qrData.sessionId !== sessionId) {
-        toast({
-          title: 'Mã QR không hợp lệ',
-          description: 'Vui lòng quét mã QR của buổi học này',
-          variant: 'destructive',
-        })
-        return
-      }
-
-      await processCheckin(qrData.token, qrData.fallbackCode)
-    } catch (error) {
-      console.error('QR scan error:', error)
-      toast({
-        title: 'Lỗi quét mã',
-        description: 'Vui lòng thử lại hoặc nhập mã thủ công',
-        variant: 'destructive',
-      })
-    }
-  }
-
-  const handleManualSubmit = async () => {
-    if (!manualCode.trim()) return
-    await processCheckin(null, manualCode.trim().toUpperCase())
-  }
-
-  const processCheckin = async (token: string | null, fallbackCode: string) => {
+  // Define processCheckin first
+  const processCheckin = useCallback(async (token: string | null, fallbackCode: string) => {
     if (!user) return
 
     setLoading(true)
@@ -188,7 +130,87 @@ export function QRScanner({
     } finally {
       setLoading(false)
     }
+  }, [user, toast, sessionId, onCancel])
+
+  // Define handleScan after processCheckin
+  const handleScan = useCallback(async (decodedText: string) => {
+    if (loading) return
+
+    try {
+      const qrData = parseQRData(decodedText)
+      if (!qrData || !qrData.sessionId || !qrData.token) {
+        console.warn('Invalid QR data:', qrData)
+        return
+      }
+      
+      if (qrData.sessionId !== sessionId) {
+        toast({
+          title: 'Mã QR không hợp lệ',
+          description: 'Vui lòng quét mã QR của buổi học này',
+          variant: 'destructive',
+        })
+        return
+      }
+
+      await processCheckin(qrData.token, qrData.fallbackCode)
+    } catch (error) {
+      console.error('QR scan error:', error)
+      toast({
+        title: 'Lỗi quét mã',
+        description: 'Vui lòng thử lại hoặc nhập mã thủ công',
+        variant: 'destructive',
+      })
+    }
+  }, [loading, sessionId, processCheckin, toast])
+
+  const handleManualSubmit = async () => {
+    if (!manualCode.trim() || manualCode.length !== 6) {
+      toast({
+        title: 'Mã không hợp lệ',
+        description: 'Vui lòng nhập mã 6 ký tự',
+        variant: 'destructive',
+      })
+      return
+    }
+    await processCheckin(null, manualCode.trim().toUpperCase())
   }
+
+  useEffect(() => {
+    if (mode !== 'camera' || !containerRef.current) return
+
+    let isActive = true
+    const scanner = new Html5Qrcode('qr-reader')
+    scannerRef.current = scanner
+
+    scanner
+      .start(
+        { facingMode: 'environment' },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+        },
+        (decodedText) => {
+          if (isActive) {
+            handleScan(decodedText)
+          }
+        },
+        () => {} // Ignore errors during scanning
+      )
+      .catch((err) => {
+        if (isActive) {
+          console.error('Camera error:', err)
+          setCameraError(true)
+          setMode('manual')
+        }
+      })
+
+    return () => {
+      isActive = false
+      if (scannerRef.current?.isScanning) {
+        scannerRef.current.stop().catch(() => {})
+      }
+    }
+  }, [mode, handleScan])
 
   return (
     <div className="space-y-4">
