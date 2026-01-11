@@ -187,7 +187,7 @@ export function QRScanner({
         { facingMode: 'environment' },
         {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
+          qrbox: { width: 350, height: 350 },
         },
         (decodedText) => {
           if (isActive) {

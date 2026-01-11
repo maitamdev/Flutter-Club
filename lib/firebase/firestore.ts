@@ -198,7 +198,7 @@ export const startAttendanceWindow = async (
     startedAt: Timestamp.fromDate(now),
     endsAt: Timestamp.fromDate(endsAt),
     tokenSeed,
-    tokenRotatesEverySec: 10, // Thay đổi mỗi 10 giây
+    tokenRotatesEverySec: 15, // Thay đổi mỗi 15 giây
   })
 
   return { tokenSeed, endsAt }

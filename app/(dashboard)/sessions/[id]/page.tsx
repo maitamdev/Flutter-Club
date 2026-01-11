@@ -121,7 +121,7 @@ export default function SessionDetailPage() {
         startedAt: new Date(),
         endsAt: result.endsAt,
         tokenSeed: result.tokenSeed,
-        tokenRotatesEverySec: 10,
+        tokenRotatesEverySec: 15,
       })
       toast({
         title: 'Đã bắt đầu điểm danh',
