@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Users, Search, Shield, UserX, UserCheck, Crown, GraduationCap, User } from 'lucide-react'
+import { Users, Search, Shield, UserX, UserCheck, Crown, GraduationCap, User, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -28,11 +28,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { getUsers, updateUser } from '@/lib/firebase/firestore'
+import { getUsers, updateUser, deleteUser } from '@/lib/firebase/firestore'
 import { User as UserType, UserRole, UserStatus } from '@/types'
 import { formatDate } from '@/lib/utils'
 import { EmptyState } from '@/components/layout/empty-state'
@@ -46,6 +55,7 @@ export default function MembersPage() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
   const [mounted, setMounted] = useState(false)
+  const [memberToDelete, setMemberToDelete] = useState<UserType | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -108,6 +118,23 @@ export default function MembersPage() {
     } catch (error: any) {
       toast({
         title: 'Cập nhật thất bại',
+        description: error.message,
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleDeleteMember = async (uid: string) => {
+    try {
+      await deleteUser(uid)
+      setUsers((prev) => prev.filter((u) => u.uid !== uid))
+      setMemberToDelete(null)
+      toast({
+        title: 'Xóa thành viên thành công',
+      })
+    } catch (error: any) {
+      toast({
+        title: 'Xóa thất bại',
         description: error.message,
         variant: 'destructive',
       })
@@ -386,6 +413,14 @@ export default function MembersPage() {
                                 Khóa tài khoản
                               </DropdownMenuItem>
                             )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => setMemberToDelete(user)}
+                              className="cursor-pointer text-red-600"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Xóa thành viên
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -397,6 +432,27 @@ export default function MembersPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!memberToDelete} onOpenChange={(open) => !open && setMemberToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa thành viên?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa thành viên <span className="font-semibold">{memberToDelete?.name}</span>? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-2">
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => memberToDelete && handleDeleteMember(memberToDelete.uid)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Xóa
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

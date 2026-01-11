@@ -52,6 +52,10 @@ export const updateUser = async (uid: string, data: Partial<User>) => {
   await updateDoc(doc(db, 'users', uid), data)
 }
 
+export const deleteUser = async (uid: string) => {
+  await deleteDoc(doc(db, 'users', uid))
+}
+
 // ============ ACCESS REQUESTS ============
 export const createAccessRequest = async (
   data: Omit<AccessRequest, 'id' | 'createdAt' | 'status'>
