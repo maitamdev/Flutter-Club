@@ -17,6 +17,7 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import { db } from './config'
+import { uploadSessionMaterial } from './storage'
 import {
   User,
   AccessRequest,
@@ -679,10 +680,8 @@ export const deleteNotification = async (userId: string, notificationId: string)
 export const uploadMaterial = async (data: any) => {
   const { file, ...materialData } = data
   
-  // Upload to Firebase Storage and get URL
-  // For now, using uploadToCloudinary helper
-  const { uploadToCloudinary } = await import('@/lib/cloudinary/config')
-  const downloadUrl = await uploadToCloudinary(file)
+  // Use Firebase Storage instead of Cloudinary for materials
+  const downloadUrl = await uploadSessionMaterial(file, 'materials')
   
   const docRef = await addDoc(collection(db, 'materials'), {
     ...materialData,
@@ -693,31 +692,62 @@ export const uploadMaterial = async (data: any) => {
   return docRef.id
 }
 
-export const getMaterials = async () => {
-  const q = query(
-    collection(db, 'materials'),
-    orderBy('uploadedAt', 'desc')
-  )
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    uploadedAt: convertTimestamp(doc.data().uploadedAt),
-  })) as any[]
+export const getMaterials = async (): Promise<any[]> => {
+  try {
+    const q = query(
+      collection(db, 'materials')
+    )
+    const snapshot = await getDocs(q)
+    const materials = snapshot.docs.map((doc) => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        title: data.title || '',
+        category: data.category || '',
+        fileName: data.fileName || '',
+        fileSize: data.fileSize || 0,
+        downloadUrl: data.downloadUrl || '',
+        uploadedBy: data.uploadedBy || '',
+        uploadedAt: data.uploadedAt ? convertTimestamp(data.uploadedAt) : new Date(),
+      }
+    })
+    // Sort by uploadedAt descending on client side
+    return materials.sort((a, b) => 
+      new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    )
+  } catch (error) {
+    console.error('Error getting materials:', error)
+    return []
+  }
 }
 
-export const getMaterialsByCategory = async (category: string) => {
-  const q = query(
-    collection(db, 'materials'),
-    where('category', '==', category),
-    orderBy('uploadedAt', 'desc')
-  )
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    uploadedAt: convertTimestamp(doc.data().uploadedAt),
-  })) as any[]
+export const getMaterialsByCategory = async (category: string): Promise<any[]> => {
+  try {
+    const q = query(
+      collection(db, 'materials'),
+      where('category', '==', category)
+    )
+    const snapshot = await getDocs(q)
+    const materials = snapshot.docs.map((doc) => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        title: data.title || '',
+        category: data.category || '',
+        fileName: data.fileName || '',
+        fileSize: data.fileSize || 0,
+        downloadUrl: data.downloadUrl || '',
+        uploadedBy: data.uploadedBy || '',
+        uploadedAt: data.uploadedAt ? convertTimestamp(data.uploadedAt) : new Date(),
+      }
+    })
+    return materials.sort((a, b) => 
+      new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    )
+  } catch (error) {
+    console.error('Error getting materials by category:', error)
+    return []
+  }
 }
 
 export const deleteMaterial = async (id: string) => {

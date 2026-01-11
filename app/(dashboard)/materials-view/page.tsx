@@ -12,7 +12,7 @@ import { Material } from '@/types'
 const CATEGORIES = ['Slides', 'Handout', 'Video', 'Exercise', 'Reference']
 
 export default function MaterialsViewPage() {
-  const [materials, setMaterials] = useState<Material[]>([])
+  const [materials, setMaterials] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const { toast } = useToast()

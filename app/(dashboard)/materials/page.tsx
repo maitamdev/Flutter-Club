@@ -15,7 +15,7 @@ import { getMaterials, uploadMaterial, deleteMaterial } from '@/lib/firebase/fir
 import { Material } from '@/types'
 
 export default function MaterialsPage() {
-  const [materials, setMaterials] = useState<Material[]>([])
+  const [materials, setMaterials] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [title, setTitle] = useState('')
