@@ -5,6 +5,17 @@ export const loginSchema = z.object({
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 })
 
+export const signupSchema = z.object({
+  name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
+  studentId: z.string().min(5, 'MSSV không hợp lệ'),
+  email: z.string().email('Email không hợp lệ'),
+  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Mật khẩu không khớp',
+  path: ['confirmPassword'],
+})
+
 export const accessRequestSchema = z.object({
   name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
   studentId: z.string().min(5, 'MSSV không hợp lệ'),
@@ -65,6 +76,7 @@ export const gradeSchema = z.object({
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>
+export type SignupFormData = z.infer<typeof signupSchema>
 export type AccessRequestFormData = z.infer<typeof accessRequestSchema>
 export type SessionFormData = z.infer<typeof sessionSchema>
 export type AssignmentFormData = z.infer<typeof assignmentSchema>
