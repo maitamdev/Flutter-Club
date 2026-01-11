@@ -29,7 +29,7 @@ export interface AccessRequest {
 }
 
 // Session Types
-export interface Material {
+export interface SessionMaterial {
   title: string
   url: string
 }
@@ -43,7 +43,7 @@ export interface Session {
   endsAt: Date
   trainerId: string
   trainerName?: string
-  materials: Material[]
+  materials: SessionMaterial[]
   createdAt: Date
 }
 
@@ -182,4 +182,15 @@ export interface AttendanceTrend {
   date: string
   count: number
   total: number
+}
+// Materials
+export interface Material {
+  id: string
+  title: string
+  category: string
+  fileName: string
+  fileSize: number
+  downloadUrl: string
+  uploadedBy: string
+  uploadedAt: Date
 }

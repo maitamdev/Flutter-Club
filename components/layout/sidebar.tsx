@@ -104,6 +104,20 @@ const menuItems: MenuItemType[] = [
     roles: ['admin', 'trainer', 'member'],
     gradient: 'from-violet-500 to-pink-500',
   },
+  {
+    title: 'Quản lý tài liệu',
+    href: '/materials',
+    icon: FileText,
+    roles: ['admin', 'trainer'],
+    gradient: 'from-amber-500 to-orange-500',
+  },
+  {
+    title: 'Tài liệu',
+    href: '/materials-view',
+    icon: GraduationCap,
+    roles: ['member'],
+    gradient: 'from-amber-500 to-orange-500',
+  },
 ]
 
 interface Counts {

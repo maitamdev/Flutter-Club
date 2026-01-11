@@ -675,3 +675,51 @@ export const markAllNotificationsAsRead = async (userId: string) => {
 export const deleteNotification = async (userId: string, notificationId: string) => {
   await deleteDoc(doc(db, 'users', userId, 'notifications', notificationId))
 }
+// ============ MATERIALS ============
+export const uploadMaterial = async (data: any) => {
+  const { file, ...materialData } = data
+  
+  // Upload to Firebase Storage and get URL
+  // For now, using uploadToCloudinary helper
+  const { uploadToCloudinary } = await import('@/lib/cloudinary/config')
+  const downloadUrl = await uploadToCloudinary(file)
+  
+  const docRef = await addDoc(collection(db, 'materials'), {
+    ...materialData,
+    downloadUrl,
+    uploadedAt: serverTimestamp(),
+  })
+  
+  return docRef.id
+}
+
+export const getMaterials = async () => {
+  const q = query(
+    collection(db, 'materials'),
+    orderBy('uploadedAt', 'desc')
+  )
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    uploadedAt: convertTimestamp(doc.data().uploadedAt),
+  })) as any[]
+}
+
+export const getMaterialsByCategory = async (category: string) => {
+  const q = query(
+    collection(db, 'materials'),
+    where('category', '==', category),
+    orderBy('uploadedAt', 'desc')
+  )
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    uploadedAt: convertTimestamp(doc.data().uploadedAt),
+  })) as any[]
+}
+
+export const deleteMaterial = async (id: string) => {
+  await deleteDoc(doc(db, 'materials', id))
+}
