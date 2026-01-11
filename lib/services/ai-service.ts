@@ -142,7 +142,9 @@ export async function chatWithAI(
 
     // Nếu có chứa từ khóa về code review hoặc có block code, sử dụng logic review chuyên sâu
     const hasCodeBlock = userMessage.includes('```')
-    const isCodeReview = hasCodeBlock || (/review|code|bug|lỗi|tối ưu|dart|flutter|giải thích/i.test(userMessage) && userMessage.length > 10)
+    const codeReviewKeywords = /review|bug|lỗi|tối ưu|giải thích|kiểm tra|xem giúp.*code/i
+    const sessionCreationKeywords = /tạo.*buổi|buổi.*học|lịch.*học|schedule|class/i
+    const isCodeReview = hasCodeBlock || (codeReviewKeywords.test(userMessage) && !sessionCreationKeywords.test(userMessage) && userMessage.length > 10)
 
     try {
         // 1. Thử dùng Groq làm engine chính (nhanh nhất)
