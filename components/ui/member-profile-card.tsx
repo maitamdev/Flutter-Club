@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { Award, Zap, Target, Star, ShieldCheck } from 'lucide-react'
+import { Award, Zap, Target, Star, ShieldCheck, Camera } from 'lucide-react'
 
 interface SkillStats {
     flutter: number
@@ -18,6 +18,7 @@ interface MemberProfileCardProps {
     level: number
     avatarUrl?: string
     skills?: SkillStats
+    onAvatarClick?: () => void
 }
 
 export const MemberProfileCard: React.FC<MemberProfileCardProps> = ({
@@ -25,7 +26,8 @@ export const MemberProfileCard: React.FC<MemberProfileCardProps> = ({
     role = "Flutter Developer",
     level = 15,
     avatarUrl,
-    skills = { flutter: 85, dart: 80, firebase: 65, uiux: 90, logic: 75 }
+    skills = { flutter: 85, dart: 80, firebase: 65, uiux: 90, logic: 75 },
+    onAvatarClick
 }) => {
     const cardRef = useRef<HTMLDivElement>(null)
 
@@ -103,12 +105,24 @@ export const MemberProfileCard: React.FC<MemberProfileCardProps> = ({
                     {/* Avatar Area */}
                     <div className="relative mb-6">
                         <div className="absolute inset-0 bg-blue-500 blur-[30px] opacity-20 animate-pulse" />
-                        <div className="relative h-32 w-32 rounded-3xl border-2 border-white/30 overflow-hidden bg-gray-900 shadow-2xl">
+                        <div
+                            className="relative h-32 w-32 rounded-3xl border-2 border-white/30 overflow-hidden bg-gray-900 shadow-2xl group/avatar cursor-pointer"
+                            onClick={onAvatarClick}
+                        >
                             <img
                                 src={avatarUrl || `/images/welcome-bot.png`}
                                 alt={name}
                                 className="w-full h-full object-cover"
                             />
+                            {/* Edit Overlay */}
+                            {onAvatarClick && (
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <div className="flex flex-col items-center gap-1">
+                                        <Camera className="h-6 w-6 text-white" />
+                                        <span className="text-xs text-white font-semibold">Chỉnh sửa</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         {/* Rank Badge */}
                         <div className="absolute -bottom-3 -right-3 h-10 w-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 border-2 border-white shadow-lg flex items-center justify-center transform rotate-12 group-hover:rotate-0 transition-transform">

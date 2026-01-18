@@ -24,9 +24,10 @@ import { Session, Assignment, Announcement } from '@/types'
 import { formatDateTime, getRelativeTime, isOverdue } from '@/lib/utils'
 import { AttendanceChart } from '@/components/charts/attendance-chart'
 import { MemberProfileCard } from '@/components/ui/member-profile-card'
+import { AvatarUploadDialog } from '@/components/ui/avatar-upload-dialog'
 
 export default function DashboardPage() {
-  const { user, isAdmin, isTrainer } = useAuth()
+  const { user, isAdmin, isTrainer, refreshUser } = useAuth()
   const [sessions, setSessions] = useState<Session[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
@@ -36,6 +37,7 @@ export default function DashboardPage() {
     pendingAssignments: 0,
   })
   const [mounted, setMounted] = useState(false)
+  const [avatarDialogOpen, setAvatarDialogOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -122,6 +124,13 @@ export default function DashboardPage() {
     return 'Chào buổi tối'
   }
 
+  const handleAvatarUploadSuccess = async (url: string) => {
+    // Refresh user data to show new avatar
+    if (user) {
+      await refreshUser()
+    }
+  }
+
   return (
     <div className="space-y-6 pb-8">
       {/* Welcome Section */}
@@ -188,6 +197,8 @@ export default function DashboardPage() {
               name={user?.name || "Thành viên"}
               role={isAdmin ? "Administrator" : isTrainer ? "Trainer" : "Core Member"}
               level={isAdmin ? 99 : 15}
+              avatarUrl={user?.photoURL}
+              onAvatarClick={() => setAvatarDialogOpen(true)}
             />
           </div>
 
@@ -353,6 +364,17 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
+
+      {/* Avatar Upload Dialog */}
+      {user && (
+        <AvatarUploadDialog
+          open={avatarDialogOpen}
+          onOpenChange={setAvatarDialogOpen}
+          onUploadSuccess={handleAvatarUploadSuccess}
+          currentAvatarUrl={user.photoURL}
+          userId={user.uid}
+        />
+      )}
     </div>
   )
 }

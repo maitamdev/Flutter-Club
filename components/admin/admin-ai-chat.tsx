@@ -366,7 +366,7 @@ export function AdminAIChat() {
                                     <Sparkles className="h-10 w-10 text-white animate-pulse" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold mb-2">Xin chào! Tôi là AI Assistant</h3>
+                                    <h3 className="text-xl font-bold mb-2">Xin chào! Tôi là AI DHV TEC</h3>
                                     <p className="text-muted-foreground max-w-md mx-auto">
                                         {user?.role === 'member'
                                             ? 'Tôi có thể giúp bạn review code Flutter, tìm lỗi và giải đáp thắc mắc kỹ thuật.'
