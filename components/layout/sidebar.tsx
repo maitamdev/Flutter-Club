@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
@@ -47,7 +48,7 @@ const menuItems: MenuItemType[] = [
     href: '/dashboard',
     icon: LayoutDashboard,
     roles: ['admin', 'trainer', 'member'],
-    gradient: 'from-blue-500 to-cyan-500',
+    gradient: 'from-navy-600 to-navy-700',
   },
   {
     title: 'Buổi học',
@@ -94,7 +95,7 @@ const menuItems: MenuItemType[] = [
     href: '/access-requests',
     icon: UserPlus,
     roles: ['admin'],
-    gradient: 'from-cyan-500 to-teal-500',
+    gradient: 'from-navy-600 to-navy-700',
     countKey: 'requests',
   },
   {
@@ -301,9 +302,15 @@ export function Sidebar() {
         {(!collapsed || mobileOpen) && (
           <Link href="/dashboard" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg">
-                <GraduationCap className="h-5 w-5 text-white" />
+              <div className="absolute inset-0 bg-gradient-to-br from-navy-600 to-navy-700 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white dark:bg-gray-800 shadow-lg overflow-hidden">
+                <Image
+                  src="/images/logo.jpg"
+                  alt="FT Club Logo"
+                  width={40}
+                  height={40}
+                  className="object-cover"
+                />
               </div>
             </div>
             <div className="flex flex-col">
@@ -314,8 +321,14 @@ export function Sidebar() {
         )}
         {collapsed && !mobileOpen && (
           <Link href="/dashboard" className="mx-auto">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg">
-              <GraduationCap className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white dark:bg-gray-800 shadow-lg overflow-hidden">
+              <Image
+                src="/images/logo.jpg"
+                alt="FT Club Logo"
+                width={40}
+                height={40}
+                className="object-cover"
+              />
             </div>
           </Link>
         )}
@@ -353,7 +366,7 @@ export function Sidebar() {
               className={cn(
                 'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative',
                 isActive
-                  ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-600 dark:text-blue-400 shadow-sm'
+                  ? 'bg-gradient-to-r from-navy-600/10 to-navy-700/10 text-navy-700 dark:text-navy-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200',
                 collapsed && !mobileOpen && 'justify-center px-2'
               )}
@@ -408,7 +421,7 @@ export function Sidebar() {
               <div className={cn(
                 'h-10 w-10 rounded-lg flex items-center justify-center text-white font-bold text-sm',
                 user.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                  user.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                  user.role === 'trainer' ? 'bg-gradient-to-br from-navy-600 to-navy-700' :
                     'bg-gradient-to-br from-emerald-500 to-teal-500'
               )}>
                 {user.name?.charAt(0).toUpperCase()}

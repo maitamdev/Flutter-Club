@@ -14,6 +14,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'WebOOM DHV TEC - Quản lý CLB Flutter',
   description: 'Hệ thống quản lý Câu lạc bộ Flutter - Khoa Kỹ Thuật Công Nghệ - ĐH Hùng Vương TPHCM',
+  icons: {
+    icon: '/images/logo.jpg',
+    shortcut: '/images/logo.jpg',
+    apple: '/images/logo.jpg',
+  },
   openGraph: {
     title: 'WebOOM DHV TEC - Quản lý CLB Flutter',
     description: 'Hệ thống quản lý Câu lạc bộ Flutter - Khoa Kỹ Thuật Công Nghệ - ĐH Hùng Vương TPHCM',

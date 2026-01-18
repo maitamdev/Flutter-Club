@@ -41,7 +41,7 @@ export function Topbar() {
       <div className="ml-14 lg:ml-0">
         <div className="flex items-center gap-2">
           <h1 className="text-lg lg:text-xl font-bold gradient-text">WebOOM DHV TEC</h1>
-          <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-[10px] font-medium text-blue-600 dark:text-blue-400 border border-blue-500/20">
+          <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-navy-600/10 to-navy-700/10 text-[10px] font-medium text-navy-700 dark:text-navy-400 border border-navy-600/20">
             <Sparkles className="h-3 w-3" />
             Beta
           </span>
@@ -77,7 +77,7 @@ export function Topbar() {
                 <AvatarFallback className={cn(
                   'text-white text-sm font-bold',
                   user?.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                    user?.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                    user?.role === 'trainer' ? 'bg-gradient-to-br from-navy-600 to-navy-700' :
                       'bg-gradient-to-br from-emerald-500 to-teal-500'
                 )}>
                   {user?.name ? getInitials(user.name) : 'U'}
@@ -92,7 +92,7 @@ export function Topbar() {
                 <AvatarFallback className={cn(
                   'text-white font-bold',
                   user?.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                    user?.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                    user?.role === 'trainer' ? 'bg-gradient-to-br from-navy-600 to-navy-700' :
                       'bg-gradient-to-br from-emerald-500 to-teal-500'
                 )}>
                   {user?.name ? getInitials(user.name) : 'U'}
@@ -116,7 +116,7 @@ export function Topbar() {
               className="flex items-center gap-2 p-3 rounded-lg cursor-pointer"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <User className="h-4 w-4 text-navy-700 dark:text-navy-400" />
               </div>
               <span>Hồ sơ cá nhân</span>
             </DropdownMenuItem>

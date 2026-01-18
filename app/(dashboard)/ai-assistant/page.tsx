@@ -166,7 +166,7 @@ export default function AIAssistantPage() {
                     </Card>
 
                     {/* User Info */}
-                    <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
+                    <Card className="border-0 shadow-lg bg-gradient-to-r from-navy-600 to-navy-700 text-white">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">

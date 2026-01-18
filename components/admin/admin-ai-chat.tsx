@@ -96,7 +96,7 @@ const formatActionPreview = (type: string, data: Record<string, unknown> | null)
                         <h4 className="font-bold text-lg">{d.title}</h4>
                         <p className="text-muted-foreground">{d.description}</p>
                         <div className="flex flex-wrap gap-2 text-sm">
-                            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+                            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-navy-700 dark:text-navy-400 rounded-lg">
                                 📍 {d.location}
                             </span>
                             <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg">
@@ -411,7 +411,7 @@ export function AdminAIChat() {
                                 <div className={cn(
                                     'h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg',
                                     message.role === 'user'
-                                        ? 'bg-gradient-to-br from-blue-500 to-cyan-500'
+                                        ? 'bg-gradient-to-br from-navy-600 to-navy-700'
                                         : 'bg-gradient-to-br from-violet-500 to-pink-500'
                                 )}>
                                     {message.role === 'user' ? (
@@ -429,7 +429,7 @@ export function AdminAIChat() {
                                     <div className={cn(
                                         'rounded-2xl px-4 py-3 shadow-md',
                                         message.role === 'user'
-                                            ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-tr-sm'
+                                            ? 'bg-gradient-to-r from-navy-600 to-navy-700 text-white rounded-tr-sm'
                                             : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-tl-sm'
                                     )}>
                                         {message.role === 'assistant' ? (

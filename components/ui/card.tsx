@@ -94,7 +94,7 @@ GlassCard.displayName = 'GlassCard'
 const GradientCard = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { gradient?: string }
->(({ className, gradient = 'from-blue-500 to-cyan-500', ...props }, ref) => (
+>(({ className, gradient = 'from-navy-600 to-navy-700', ...props }, ref) => (
   <div
     ref={ref}
     className={cn(

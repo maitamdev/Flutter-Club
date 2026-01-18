@@ -224,7 +224,7 @@ export default function NewAssignmentPage() {
           </Button>
           <Button
             type="submit"
-            className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500"
+            className="flex-1 bg-gradient-to-r from-navy-600 to-navy-700"
             disabled={loading}
           >
             {loading ? (

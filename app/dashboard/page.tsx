@@ -107,8 +107,8 @@ export default function DashboardPage() {
           title: 'Thành viên',
           value: stats.totalMembers,
           icon: Users,
-          gradient: 'from-blue-500 to-cyan-600',
-          bgGradient: 'from-blue-500/10 to-cyan-500/10',
+          gradient: 'from-navy-600 to-navy-700',
+          bgGradient: 'from-navy-600/10 to-navy-700/10',
           href: '/members',
         },
       ]
@@ -253,7 +253,7 @@ export default function DashboardPage() {
             <Card className={`border-0 shadow-lg overflow-hidden transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '400ms' }}>
               <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-navy-600 to-navy-700 flex items-center justify-center shadow-lg">
                     <TrendingUp className="h-5 w-5 text-white" />
                   </div>
                   <div>

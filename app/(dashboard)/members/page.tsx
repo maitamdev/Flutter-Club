@@ -152,7 +152,7 @@ export default function MembersPage() {
         )
       case 'trainer':
         return (
-          <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0">
+          <Badge className="bg-gradient-to-r from-navy-600 to-navy-700 text-white border-0">
             <GraduationCap className="h-3 w-3 mr-1" />
             Trainer
           </Badge>
@@ -222,10 +222,10 @@ export default function MembersPage() {
       {/* Stats */}
       <div className={`grid gap-4 grid-cols-2 lg:grid-cols-4 transition-all duration-500 delay-100 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <Card className="border-0 shadow-lg overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
+          <div className="h-1 bg-gradient-to-r from-navy-600 to-navy-700" />
           <CardContent className="p-4">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-navy-600 to-navy-700 flex items-center justify-center shadow-lg">
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -341,7 +341,7 @@ export default function MembersPage() {
                             <AvatarImage src={user.photoURL} />
                             <AvatarFallback className={`text-white text-sm font-bold ${
                               user.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                              user.role === 'trainer' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                              user.role === 'trainer' ? 'bg-gradient-to-br from-navy-600 to-navy-700' :
                               'bg-gradient-to-br from-gray-400 to-gray-500'
                             }`}>
                               {getInitials(user.name)}

@@ -100,7 +100,7 @@ export default function RequestAccessPage() {
 
       <Card className="w-full max-w-md relative backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-white/20">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/30">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-navy-600 to-navy-700 shadow-lg shadow-navy-600/30">
             <GraduationCap className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -197,7 +197,7 @@ export default function RequestAccessPage() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                className="w-full h-11 bg-gradient-to-r from-navy-600 to-navy-700 hover:from-blue-600 hover:to-cyan-600"
                 disabled={loading}
               >
                 {loading ? (

@@ -175,7 +175,7 @@ export default function MaterialsPage() {
                   id="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>
@@ -198,7 +198,7 @@ export default function MaterialsPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                className="w-full bg-gradient-to-r from-navy-600 to-navy-700"
                 disabled={uploading}
               >
                 {uploading ? (

@@ -162,7 +162,7 @@ export default function QuizzesPage() {
                           <span className="text-sm font-medium text-purple-700 dark:text-purple-400">{quiz.questions.length} câu</span>
                         </div>
                         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                          <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                          <Clock className="h-4 w-4 text-navy-700 dark:text-navy-400" />
                           <span className="text-sm font-medium text-blue-700 dark:text-blue-400">{quiz.duration} phút</span>
                         </div>
                       </div>

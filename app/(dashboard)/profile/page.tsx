@@ -90,7 +90,7 @@ export default function ProfilePage() {
       case 'admin':
         return 'bg-gradient-to-r from-purple-500 to-pink-500'
       case 'trainer':
-        return 'bg-gradient-to-r from-blue-500 to-cyan-500'
+        return 'bg-gradient-to-r from-navy-600 to-navy-700'
       default:
         return 'bg-gradient-to-r from-emerald-500 to-teal-500'
     }
@@ -141,7 +141,7 @@ export default function ProfilePage() {
       {/* Header */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <div className="flex items-center gap-2 mb-1">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-navy-600 to-navy-700 flex items-center justify-center shadow-lg">
             <User className="h-5 w-5 text-white" />
           </div>
           <h1 className="text-2xl font-bold">Hồ sơ cá nhân</h1>
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                 ) : (
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                     <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                      <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <User className="h-5 w-5 text-navy-700 dark:text-navy-400" />
                     </div>
                     <p className="font-medium">{user.name}</p>
                   </div>
@@ -345,7 +345,7 @@ export default function ProfilePage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 h-11 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                  className="flex-1 h-11 rounded-xl bg-gradient-to-r from-navy-600 to-navy-700 hover:from-blue-600 hover:to-cyan-600"
                   disabled={saving}
                 >
                   {saving ? (

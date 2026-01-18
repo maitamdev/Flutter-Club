@@ -33,8 +33,8 @@ export const FloatingRobot = () => {
             if (isDragging || isHovered || !isVisible) return
 
             // Calculate random target within screen bounds
-            const maxX = window.innerWidth - 150
-            const maxY = window.innerHeight - 150
+            const maxX = window.innerWidth - 100
+            const maxY = window.innerHeight - 100
             const nextX = Math.random() * maxX
             const nextY = Math.random() * maxY
 
@@ -64,7 +64,7 @@ export const FloatingRobot = () => {
                 initial={{ opacity: 0, scale: 0, left: '85%', top: '85%' }}
                 exit={{ opacity: 0, scale: 0 }}
                 className="fixed z-[9999] pointer-events-none"
-                style={{ width: 120, height: 120 }}
+                style={{ width: 80, height: 80 }}
             >
                 <motion.div
                     drag
@@ -108,7 +108,7 @@ export const FloatingRobot = () => {
                         className="relative w-full h-full"
                     >
                         {/* Premium Glow Background */}
-                        <div className="absolute inset-0 bg-blue-400/30 blur-[40px] rounded-full scale-90 animate-pulse" />
+                        <div className="absolute inset-0 bg-navy-500/30 blur-[40px] rounded-full scale-90 animate-pulse" />
                         <div className="absolute inset-0 bg-indigo-500/20 blur-[60px] rounded-full scale-110" />
 
                         {/* The Mascot Image - Glass Container */}
@@ -149,7 +149,7 @@ export const FloatingRobot = () => {
                     </motion.div>
 
                     {/* Trail Effect - Tech Style */}
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-12 h-2 bg-blue-400/20 blur-xl rounded-full scale-x-150 animate-pulse" />
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-12 h-2 bg-navy-500/20 blur-xl rounded-full scale-x-150 animate-pulse" />
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-8 h-1 bg-blue-400/40 blur-md rounded-full scale-x-125" />
                 </motion.div>
             </motion.div>
