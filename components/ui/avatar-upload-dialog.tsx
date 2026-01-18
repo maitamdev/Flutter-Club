@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button'
 import { Upload, X, Check, AlertCircle, ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { updateUser } from '@/lib/firebase/firestore'
 
 interface AvatarUploadDialogProps {
     open: boolean
@@ -108,19 +109,8 @@ export function AvatarUploadDialog({
 
             const { url } = await uploadResponse.json()
 
-            // Update user profile
-            const updateResponse = await fetch('/api/update-profile-photo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ photoURL: url, userId }),
-            })
-
-            if (!updateResponse.ok) {
-                const errorData = await updateResponse.json()
-                throw new Error(errorData.error || 'Failed to update profile')
-            }
+            // Update user profile directly in Firestore (client-side)
+            await updateUser(userId, { photoURL: url })
 
             setSuccess(true)
             setTimeout(() => {

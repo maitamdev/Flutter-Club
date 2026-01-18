@@ -5,6 +5,8 @@ export async function POST(req: NextRequest) {
     try {
         const { photoURL, userId } = await req.json()
 
+        console.log('Update profile photo request:', { userId, photoURL })
+
         if (!userId) {
             return NextResponse.json(
                 { error: 'User ID is required' },
@@ -30,17 +32,26 @@ export async function POST(req: NextRequest) {
         }
 
         // Update user profile in Firestore
-        await updateUser(userId, { photoURL })
+        try {
+            await updateUser(userId, { photoURL })
+            console.log('Successfully updated photoURL for user:', userId)
+        } catch (firestoreError: any) {
+            console.error('Firestore update error:', firestoreError)
+            return NextResponse.json(
+                { error: `Firestore error: ${firestoreError.message}` },
+                { status: 500 }
+            )
+        }
 
         return NextResponse.json({
             success: true,
             message: 'Profile photo updated successfully'
         })
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Update profile photo error:', error)
         return NextResponse.json(
-            { error: 'Failed to update profile photo' },
+            { error: `Failed to update profile photo: ${error.message}` },
             { status: 500 }
         )
     }
