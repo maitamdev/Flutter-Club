@@ -47,15 +47,6 @@ export async function POST(req: NextRequest) {
         uploadFormData.append('file', file)
         uploadFormData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET || '')
         uploadFormData.append('folder', 'ft-club-hub/avatars')
-        // Add transformation for avatar optimization
-        uploadFormData.append('transformation', JSON.stringify({
-            width: 400,
-            height: 400,
-            crop: 'fill',
-            gravity: 'face',
-            quality: 'auto:good',
-            fetch_format: 'auto'
-        }))
 
         const cloudinaryResponse = await fetch(
             `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
