@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Shield, Mail, Lock, Loader2, Users, AlertTriangle } from 'lucide-react'
+import { Shield, Mail, Lock, Loader2, Users, AlertTriangle, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,6 +16,7 @@ import { loginSchema, LoginFormData } from '@/lib/validations'
 
 export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -163,11 +164,18 @@ export default function AdminLoginPage() {
                     <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                     <Input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-11 h-12 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
+                      className="pl-11 pr-11 h-12 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                       {...register('password')}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-gray-500 hover:text-purple-400 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
                   </div>
                   {errors.password && (
                     <p className="text-sm text-red-400">{errors.password.message}</p>
