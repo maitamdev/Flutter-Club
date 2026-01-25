@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { GraduationCap, Mail, Lock, Loader2, User, BookOpen, ArrowRight, Sparkles, Zap, Code2, Smartphone } from 'lucide-react'
+import { GraduationCap, Mail, Lock, Loader2, User, BookOpen, ArrowRight, Sparkles, Zap, Code2, Smartphone, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,6 +17,8 @@ import { signupSchema, SignupFormData } from '@/lib/validations'
 export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -262,11 +264,18 @@ export default function SignupPage() {
                     <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" />
                     <Input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-11 h-12 bg-gray-800/30 border-gray-700/50 text-white placeholder:text-gray-500 rounded-xl focus:border-cyan-500/50 focus:ring-cyan-500/20 transition-all"
+                      className="pl-11 pr-11 h-12 bg-gray-800/30 border-gray-700/50 text-white placeholder:text-gray-500 rounded-xl focus:border-cyan-500/50 focus:ring-cyan-500/20 transition-all"
                       {...register('password')}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3.5 text-gray-500 hover:text-cyan-400 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
                   </div>
                   {errors.password && (
                     <p className="text-sm text-red-400">{errors.password.message}</p>
@@ -280,11 +289,18 @@ export default function SignupPage() {
                     <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" />
                     <Input
                       id="confirmPassword"
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-11 h-12 bg-gray-800/30 border-gray-700/50 text-white placeholder:text-gray-500 rounded-xl focus:border-cyan-500/50 focus:ring-cyan-500/20 transition-all"
+                      className="pl-11 pr-11 h-12 bg-gray-800/30 border-gray-700/50 text-white placeholder:text-gray-500 rounded-xl focus:border-cyan-500/50 focus:ring-cyan-500/20 transition-all"
                       {...register('confirmPassword')}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-3.5 text-gray-500 hover:text-cyan-400 transition-colors"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
                   </div>
                   {errors.confirmPassword && (
                     <p className="text-sm text-red-400">{errors.confirmPassword.message}</p>
