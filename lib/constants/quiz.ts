@@ -1,0 +1,10 @@
+﻿// Quiz configuration
+export const QUIZ_CONFIG = {
+  MIN_QUESTIONS: 1,
+  MAX_QUESTIONS: 50,
+  MIN_DURATION: 1,
+  MAX_DURATION: 60,
+  MIN_OPTIONS: 2,
+  MAX_OPTIONS: 6,
+  DEFAULT_DURATION: 15,
+}
