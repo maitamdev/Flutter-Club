@@ -1,0 +1,2 @@
+﻿export interface ClubEvent { id: string; title: string; description: string; type: EventType; startDate: Date; endDate: Date; location: string; maxParticipants?: number; registeredCount: number; status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'; coverImage?: string; organizer: string; tags: string[]; }
+export type EventType = 'workshop' | 'meetup' | 'hackathon' | 'seminar' | 'social' | 'competition';
