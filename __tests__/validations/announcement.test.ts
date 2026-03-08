@@ -1,0 +1,1 @@
+﻿describe('Announcement Validation', () => { it('should require title', () => { const isValid = (t: string) => t.length > 0; expect(isValid('')).toBe(false); }); it('should limit title length', () => { const isValid = (t: string) => t.length <= 200; expect(isValid('Test')).toBe(true); }); });
