@@ -1,0 +1,28 @@
+﻿// English translations
+const en: Record<string, string> = {
+  'app.name': 'Flutter Club DHV',
+  'app.tagline': 'Flutter App Development Club',
+  'nav.home': 'Home',
+  'nav.dashboard': 'Dashboard',
+  'nav.members': 'Members',
+  'nav.events': 'Events',
+  'nav.sessions': 'Sessions',
+  'nav.materials': 'Materials',
+  'nav.quizzes': 'Quizzes',
+  'nav.assignments': 'Assignments',
+  'nav.profile': 'Profile',
+  'nav.settings': 'Settings',
+  'auth.login': 'Login',
+  'auth.logout': 'Logout',
+  'auth.register': 'Register',
+  'common.save': 'Save',
+  'common.cancel': 'Cancel',
+  'common.delete': 'Delete',
+  'common.edit': 'Edit',
+  'common.search': 'Search',
+  'common.loading': 'Loading...',
+  'common.error': 'An error occurred',
+  'common.success': 'Success',
+  'common.confirm': 'Confirm',
+};
+export default en;
