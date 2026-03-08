@@ -1,0 +1,28 @@
+﻿// Vietnamese translations
+const vi: Record<string, string> = {
+  'app.name': 'Flutter Club DHV',
+  'app.tagline': 'Cau lac bo phat trien ung dung Flutter',
+  'nav.home': 'Trang chu',
+  'nav.dashboard': 'Bang dieu khien',
+  'nav.members': 'Thanh vien',
+  'nav.events': 'Su kien',
+  'nav.sessions': 'Buoi hoc',
+  'nav.materials': 'Tai lieu',
+  'nav.quizzes': 'Bai kiem tra',
+  'nav.assignments': 'Bai tap',
+  'nav.profile': 'Ho so',
+  'nav.settings': 'Cai dat',
+  'auth.login': 'Dang nhap',
+  'auth.logout': 'Dang xuat',
+  'auth.register': 'Dang ky',
+  'common.save': 'Luu',
+  'common.cancel': 'Huy',
+  'common.delete': 'Xoa',
+  'common.edit': 'Chinh sua',
+  'common.search': 'Tim kiem',
+  'common.loading': 'Dang tai...',
+  'common.error': 'Co loi xay ra',
+  'common.success': 'Thanh cong',
+  'common.confirm': 'Xac nhan',
+};
+export default vi;
