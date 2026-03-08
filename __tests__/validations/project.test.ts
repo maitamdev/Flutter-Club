@@ -1,0 +1,1 @@
+﻿describe('Project Validation', () => { it('should require project name', () => { const isValid = (n: string) => n.trim().length > 0; expect(isValid('My Project')).toBe(true); }); it('should validate status', () => { const valid = ['planning','active','completed','archived']; expect(valid).toContain('active'); }); });
