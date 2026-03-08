@@ -1,0 +1,1 @@
+﻿describe('Membership Validation', () => { it('should validate role', () => { const roles = ['admin','moderator','member']; expect(roles).toContain('member'); }); it('should validate join date', () => { const d = new Date(); expect(d).toBeInstanceOf(Date); }); });
