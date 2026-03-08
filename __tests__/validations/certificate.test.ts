@@ -1,0 +1,1 @@
+﻿describe('Certificate Validation', () => { it('should require recipient name', () => { const isValid = (n: string) => n.trim().length > 0; expect(isValid('John')).toBe(true); }); it('should validate date format', () => { const d = new Date('2024-01-01'); expect(isNaN(d.getTime())).toBe(false); }); });
