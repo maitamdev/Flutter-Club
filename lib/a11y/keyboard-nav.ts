@@ -1,0 +1,3 @@
+﻿// Keyboard navigation helpers
+export const KEYS = { ENTER: 'Enter', SPACE: ' ', ESCAPE: 'Escape', TAB: 'Tab', ARROW_UP: 'ArrowUp', ARROW_DOWN: 'ArrowDown', ARROW_LEFT: 'ArrowLeft', ARROW_RIGHT: 'ArrowRight', HOME: 'Home', END: 'End' } as const;
+export function handleArrowNav(event: KeyboardEvent, items: HTMLElement[], currentIndex: number): number { switch (event.key) { case KEYS.ARROW_DOWN: return Math.min(currentIndex + 1, items.length - 1); case KEYS.ARROW_UP: return Math.max(currentIndex - 1, 0); case KEYS.HOME: return 0; case KEYS.END: return items.length - 1; default: return currentIndex; } }
