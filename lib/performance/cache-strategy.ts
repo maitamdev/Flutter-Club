@@ -1,0 +1,3 @@
+﻿// Caching strategy utilities
+export interface CacheEntry<T> { data: T; timestamp: number; ttl: number; }
+export class MemoryCache<T> { private cache = new Map<string, CacheEntry<T>>(); set(key: string, data: T, ttlMs: number = 300000): void { this.cache.set(key, { data, timestamp: Date.now(), ttl: ttlMs }); } get(key: string): T | null { const entry = this.cache.get(key); if (!entry) return null; if (Date.now() - entry.timestamp > entry.ttl) { this.cache.delete(key); return null; } return entry.data; } has(key: string): boolean { return this.get(key) !== null; } clear(): void { this.cache.clear(); } size(): number { return this.cache.size; } }
