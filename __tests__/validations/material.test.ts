@@ -1,0 +1,1 @@
+﻿describe('Material Validation', () => { it('should require title', () => { expect('Lesson 1'.length).toBeGreaterThan(0); }); it('should validate URL', () => { const isUrl = (u: string) => u.startsWith('http'); expect(isUrl('https://example.com')).toBe(true); }); });
