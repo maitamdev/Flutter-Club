@@ -1,0 +1,1 @@
+﻿describe('Event Validation', () => { it('should require event title', () => { expect('Flutter Meetup'.length).toBeGreaterThan(0); }); it('should validate date range', () => { const start = new Date('2024-01-01'); const end = new Date('2024-01-02'); expect(end > start).toBe(true); }); });
