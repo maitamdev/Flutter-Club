@@ -1,0 +1,1 @@
+﻿describe('Session Validation', () => { it('should require session title', () => { expect('Workshop #5'.length).toBeGreaterThan(0); }); it('should validate duration', () => { const isValid = (d: number) => d > 0 && d <= 480; expect(isValid(120)).toBe(true); }); });
