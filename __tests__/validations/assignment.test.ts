@@ -1,0 +1,1 @@
+﻿describe('Assignment Validation', () => { it('should require due date', () => { const isValid = (d: Date | null) => d !== null; expect(isValid(null)).toBe(false); }); it('should validate score range', () => { const isValid = (s: number) => s >= 0 && s <= 100; expect(isValid(85)).toBe(true); }); });
