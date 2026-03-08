@@ -1,0 +1,1 @@
+﻿describe('Feedback Validation', () => { it('should validate rating 1-5', () => { const isValid = (r: number) => r >= 1 && r <= 5; expect(isValid(3)).toBe(true); expect(isValid(0)).toBe(false); }); });
