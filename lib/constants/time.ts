@@ -1,0 +1,5 @@
+﻿// Time constants
+export const MILLISECONDS = { SECOND: 1000, MINUTE: 60 * 1000, HOUR: 60 * 60 * 1000, DAY: 24 * 60 * 60 * 1000, WEEK: 7 * 24 * 60 * 60 * 1000, MONTH: 30 * 24 * 60 * 60 * 1000, } as const;
+export const SECONDS = { MINUTE: 60, HOUR: 3600, DAY: 86400, WEEK: 604800, } as const;
+export const SESSION_TIMEOUT = 30 * MILLISECONDS.MINUTE;
+export const TOKEN_REFRESH_INTERVAL = 55 * MILLISECONDS.MINUTE;
