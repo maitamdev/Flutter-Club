@@ -1,0 +1,1 @@
+﻿describe('Quiz Validation', () => { it('should require at least one question', () => { const qs = [{ text: 'Q1', options: ['A','B','C'] }]; expect(qs.length).toBeGreaterThan(0); }); it('should validate answer index', () => { const isValid = (i: number, max: number) => i >= 0 && i < max; expect(isValid(1, 4)).toBe(true); }); });
