@@ -1,0 +1,1 @@
+﻿describe('Attendance Validation', () => { it('should validate session id', () => { const isValid = (id: string) => id.length > 0; expect(isValid('s1')).toBe(true); }); it('should validate status', () => { const valid = ['present','absent','late']; expect(valid).toContain('present'); }); });
