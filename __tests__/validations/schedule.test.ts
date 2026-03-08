@@ -1,0 +1,1 @@
+﻿describe('Schedule Validation', () => { it('should validate time format', () => { const re = /^([01]\\d|2[0-3]):([0-5]\\d)$/; expect(re.test('14:30')).toBe(true); expect(re.test('25:00')).toBe(false); }); });
