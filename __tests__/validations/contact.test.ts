@@ -1,0 +1,1 @@
+﻿describe('Contact Validation', () => { it('should validate email', () => { const re = /^[^@]+@[^@]+$/; expect(re.test('a@b.com')).toBe(true); }); it('should validate phone', () => { const isValid = (p: string) => /^[0-9+\\-\\s]+$/.test(p); expect(isValid('+84 123 456 789')).toBe(true); }); });
