@@ -1,0 +1,3 @@
+﻿// Observer pattern
+export type Listener<T> = (data: T) => void;
+export class EventEmitter<T = unknown> { private listeners: Map<string, Set<Listener<T>>> = new Map(); on(event: string, listener: Listener<T>): () => void { if (!this.listeners.has(event)) this.listeners.set(event, new Set()); this.listeners.get(event)!.add(listener); return () => this.off(event, listener); } off(event: string, listener: Listener<T>): void { this.listeners.get(event)?.delete(listener); } emit(event: string, data: T): void { this.listeners.get(event)?.forEach(fn => fn(data)); } clear(): void { this.listeners.clear(); } }
