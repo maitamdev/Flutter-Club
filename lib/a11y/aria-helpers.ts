@@ -1,0 +1,3 @@
+﻿// ARIA attribute helpers
+export function getAriaProps(options: { label?: string; describedBy?: string; expanded?: boolean; selected?: boolean; disabled?: boolean; hidden?: boolean; required?: boolean; invalid?: boolean; }): Record<string, string | boolean | undefined> { return { 'aria-label': options.label, 'aria-describedby': options.describedBy, 'aria-expanded': options.expanded, 'aria-selected': options.selected, 'aria-disabled': options.disabled, 'aria-hidden': options.hidden, 'aria-required': options.required, 'aria-invalid': options.invalid }; }
+export function generateId(prefix: string): string { return prefix + '-' + Math.random().toString(36).substr(2, 9); }
