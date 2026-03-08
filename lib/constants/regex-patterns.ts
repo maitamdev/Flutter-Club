@@ -1,0 +1,2 @@
+﻿// Common regex patterns
+export const REGEX = { EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, PHONE_VN: /^(\+84|0)(3|5|7|8|9)\d{8}$/, STUDENT_ID: /^\d{2}[A-Z]{2}\d{6}$/, PASSWORD_STRONG: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, URL: /^https?:\/\/[^\s/$.?#].[^\s]*$/i, SLUG: /^[a-z0-9]+(?:-[a-z0-9]+)*$/, HEX_COLOR: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/ } as const;
