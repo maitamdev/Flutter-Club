@@ -1,0 +1,1 @@
+﻿describe('Poll Validation', () => { it('should require at least 2 options', () => { const isValid = (opts: string[]) => opts.length >= 2; expect(isValid(['A','B'])).toBe(true); expect(isValid(['A'])).toBe(false); }); });
